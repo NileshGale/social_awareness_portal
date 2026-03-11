@@ -537,6 +537,45 @@ function handleBookSchedule() {
     $stmt = $conn->prepare("INSERT INTO schedule_bookings (user_id, name, email, mobile, problem_desc, preferred_date) VALUES (?,?,?,?,?,?)");
     $stmt->bind_param("isssss", $user_id, $name, $email, $mobile, $problem_desc, $preferred_date);
     if ($stmt->execute()) {
+        // Send email to admin
+        $admin_email = "dhanashreegame@gmail.com";
+        $subject = "New Schedule Booking Request on Zoom or Google Meet";
+        $email_body = "
+        <html>
+        <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
+            <h2 style='color: #1e3a8a;'>New Schedule Booking Request on Zoom or Google Meet</h2>
+            <p>You have received a new schedule booking request from the Social Awareness Portal. Here are the details:</p>
+            <table style='width: 100%; border-collapse: collapse; margin-top: 20px;'>
+                <tr>
+                    <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold; width: 30%;'>Full Name</td>
+                    <td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($name) . "</td>
+                </tr>
+                <tr>
+                    <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Email Address</td>
+                    <td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($email) . "</td>
+                </tr>
+                <tr>
+                    <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Mobile Number</td>
+                    <td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($mobile) . "</td>
+                </tr>
+                <tr>
+                    <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Preferred Date</td>
+                    <td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($preferred_date) . "</td>
+                </tr>
+                <tr>
+                    <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Problem Description</td>
+                    <td style='padding: 10px; border: 1px solid #ddd;'>" . nl2br(htmlspecialchars($problem_desc)) . "</td>
+                </tr>
+            </table>
+            <p style='margin-top: 30px; font-size: 0.9em; color: #777;'>Automated message from Social Awareness Portal.</p>
+        </body>
+        </html>
+        ";
+        
+        // Use the generic send notification function with Reply-To header
+        $reply_to = ['email' => $email, 'name' => $name];
+        sendNotificationEmail($admin_email, $subject, $email_body, $reply_to);
+
         echo json_encode(['success' => true, 'message' => 'Your schedule has been booked successfully! We will contact you soon.', 'id' => $stmt->insert_id]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Failed to book schedule. Please try again.']);

@@ -58,6 +58,14 @@ function sendOTPEmail($to_email, $otp, $purpose) {
     $logEntry = date('Y-m-d H:i:s') . " | TO: $to_email | PURPOSE: $purpose | OTP: $otp\n";
     @file_put_contents($logFile, $logEntry, FILE_APPEND);
 
+    return sendEmailCore($to_email, $subject, $message);
+}
+
+function sendNotificationEmail($to_email, $subject, $body_html, $reply_to = null) {
+    return sendEmailCore($to_email, $subject, $body_html, $reply_to);
+}
+
+function sendEmailCore($to_email, $subject, $message, $reply_to = null) {
     // ── Try PHPMailer ──────────────────────────────────────────────────────
     // Check all common PHPMailer locations
     $phpmailerPaths = [
@@ -117,6 +125,9 @@ function sendOTPEmail($to_email, $otp, $purpose) {
             $mail->Port       = SMTP_PORT;
             $mail->setFrom(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
             $mail->addAddress($to_email);
+            if ($reply_to && filter_var($reply_to['email'], FILTER_VALIDATE_EMAIL)) {
+                $mail->addReplyTo($reply_to['email'], $reply_to['name'] ?? '');
+            }
             $mail->isHTML(true);
             $mail->Subject = $subject;
             $mail->Body    = $message;
@@ -133,6 +144,10 @@ function sendOTPEmail($to_email, $otp, $purpose) {
         $headers  = "MIME-Version: 1.0\r\n";
         $headers .= "Content-type: text/html; charset=UTF-8\r\n";
         $headers .= "From: " . SMTP_FROM_NAME . " <" . SMTP_FROM_EMAIL . ">\r\n";
+        if ($reply_to && filter_var($reply_to['email'], FILTER_VALIDATE_EMAIL)) {
+            $r_name = $reply_to['name'] ?? '';
+            $headers .= "Reply-To: $r_name <" . $reply_to['email'] . ">\r\n";
+        }
         $sent = @mail($to_email, $subject, $message, $headers);
         if ($sent) {
             return ['sent' => true, 'method' => 'mail'];
@@ -140,7 +155,6 @@ function sendOTPEmail($to_email, $otp, $purpose) {
     }
 
     // ── SMTP not configured or all methods failed ───────────────────────────
-    // Return false — api.php will include OTP in the response for dev use
     return ['sent' => false, 'method' => 'none'];
 }
 ?>
