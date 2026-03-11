@@ -38,6 +38,7 @@ switch ($action) {
     case 'admin_get_feedbacks':       handleAdminGetFeedbacks(); break;
     case 'admin_reply_feedback':      handleAdminReplyFeedback(); break;
     case 'admin_delete_reply':        handleAdminDeleteReply(); break;
+    case 'admin_delete_feedback':     handleAdminDeleteFeedback(); break;
     case 'admin_change_feedback_status': handleAdminChangeFeedbackStatus(); break;
     case 'admin_search_user':         handleAdminSearchUser(); break;
     case 'admin_update_user':         handleAdminUpdateUser(); break;

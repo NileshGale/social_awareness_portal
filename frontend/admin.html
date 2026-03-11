@@ -700,6 +700,29 @@
             background: #fecaca;
         }
 
+        .btn-delete-feedback {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: #dc2626;
+            color: white;
+            padding: 0.35rem 0.9rem;
+            border-radius: 7px;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.77rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: auto;
+        }
+
+        .btn-delete-feedback:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(220, 38, 38, 0.3);
+        }
+
         .reply-success {
             display: flex;
             align-items: center;
@@ -1877,6 +1900,7 @@
             <button class="btn-status btn-approve" onclick="changeStatus(${f.id},'approved')"><i class="fas fa-check"></i> Approve</button>
             <button class="btn-status btn-pending" onclick="changeStatus(${f.id},'pending')"><i class="fas fa-clock"></i> Pending</button>
             <button class="btn-status btn-reject" onclick="changeStatus(${f.id},'rejected')"><i class="fas fa-times"></i> Reject</button>
+            <button class="btn-delete-feedback" onclick="deleteFeedback(${f.id})"><i class="fas fa-trash-alt"></i> Delete Feedback</button>
         </div>
 
         <!-- Reply form -->
@@ -1974,6 +1998,32 @@
             } catch (e) {
                 console.error(e);
                 alert('Connection error while deleting reply.');
+            }
+        }
+
+        /* ── Delete Entire Feedback ── */
+        async function deleteFeedback(fid) {
+            if (!confirm('Are you sure you want to permanently delete this feedback?\nThis will also remove all replies, likes, and votes associated with it.\nThis action cannot be undone.')) return;
+
+            const fd = new FormData();
+            fd.append('action', 'admin_delete_feedback');
+            fd.append('feedback_id', fid);
+
+            try {
+                const r = await fetch(API, { method: 'POST', body: fd });
+                const d = await r.json();
+                if (d.success) {
+                    // Remove from local array
+                    allFeedbacks = allFeedbacks.filter(f => f.id != fid);
+                    renderFeedbacks();
+                    updateStats();
+                    updateCounts();
+                } else {
+                    alert('Error deleting feedback: ' + d.message);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Connection error while deleting feedback.');
             }
         }
 

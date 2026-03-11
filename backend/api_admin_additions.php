@@ -161,6 +161,25 @@ function handleAdminDeleteReply() {
     echo json_encode(['success' => true, 'message' => 'Reply deleted']);
 }
 
+// ── Delete entire feedback ──
+function handleAdminDeleteFeedback() {
+    global $conn;
+    if (!isAdmin()) {
+        echo json_encode(['success' => false, 'message' => 'Admin access required']);
+        return;
+    }
+    $feedback_id = (int)($_POST['feedback_id'] ?? 0);
+    if (!$feedback_id) {
+        echo json_encode(['success' => false, 'message' => 'Feedback ID required']);
+        return;
+    }
+    $stmt = $conn->prepare("DELETE FROM feedback WHERE id=?");
+    $stmt->bind_param("i", $feedback_id);
+    $stmt->execute();
+    $stmt->close();
+    echo json_encode(['success' => true, 'message' => 'Feedback deleted successfully']);
+}
+
 // ── Change feedback status ──
 function handleAdminChangeFeedbackStatus() {
     global $conn;
