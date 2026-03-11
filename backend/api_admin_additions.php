@@ -512,6 +512,38 @@ function handleLikeFeedback() {
     echo json_encode(['success' => true, 'liked' => $liked, 'likes' => (int)$res['likes']]);
 }
 
+// ── Book a Schedule ──
+function handleBookSchedule() {
+    global $conn;
+    $name          = sanitizeInput($_POST['name'] ?? '');
+    $email         = sanitizeInput($_POST['email'] ?? '');
+    $mobile        = sanitizeInput($_POST['mobile'] ?? '');
+    $problem_desc  = sanitizeInput($_POST['problem_desc'] ?? '');
+    $preferred_date = sanitizeInput($_POST['preferred_date'] ?? '');
+    $user_id       = isLoggedIn() ? getCurrentUserId() : null;
+
+    if (!$name || !$email || !$mobile || !$problem_desc || !$preferred_date) {
+        echo json_encode(['success' => false, 'message' => 'All fields are required']);
+        return;
+    }
+
+    // Validate date is in the future
+    $today = date('Y-m-d');
+    if ($preferred_date <= $today) {
+        echo json_encode(['success' => false, 'message' => 'Please select a future date']);
+        return;
+    }
+
+    $stmt = $conn->prepare("INSERT INTO schedule_bookings (user_id, name, email, mobile, problem_desc, preferred_date) VALUES (?,?,?,?,?,?)");
+    $stmt->bind_param("isssss", $user_id, $name, $email, $mobile, $problem_desc, $preferred_date);
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Your schedule has been booked successfully! We will contact you soon.', 'id' => $stmt->insert_id]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to book schedule. Please try again.']);
+    }
+    $stmt->close();
+}
+
 
 // ══════════════════════════════════════════════════════════════
 //  PATCHES FOR EXISTING FUNCTIONS

@@ -45,6 +45,7 @@ switch ($action) {
     case 'admin_delete_campaign':     handleAdminDeleteCampaign(); break;
     case 'vote_reply':                handleVoteReply(); break;
     case 'like_feedback':             handleLikeFeedback(); break;
+    case 'book_schedule':             handleBookSchedule(); break;
     default:
         echo json_encode(['success' => false, 'message' => 'Invalid action']);
 }

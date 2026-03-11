@@ -172,6 +172,23 @@ CREATE TABLE reply_votes (
     CONSTRAINT fk_rv_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ================================================================
+--  TABLE 11: schedule_bookings
+-- ================================================================
+CREATE TABLE schedule_bookings (
+    id              INT          NOT NULL AUTO_INCREMENT,
+    user_id         INT          DEFAULT NULL,
+    name            VARCHAR(255) NOT NULL,
+    email           VARCHAR(255) NOT NULL,
+    mobile          VARCHAR(15)  NOT NULL,
+    problem_desc    TEXT         NOT NULL,
+    preferred_date  DATE         NOT NULL,
+    status          ENUM('pending','confirmed','completed','cancelled') NOT NULL DEFAULT 'pending',
+    created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_sb_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ================================================================
@@ -218,6 +235,7 @@ ALTER TABLE users AUTO_INCREMENT = 100;
 ALTER TABLE campaigns AUTO_INCREMENT = 100;
 ALTER TABLE feedback AUTO_INCREMENT = 100;
 ALTER TABLE contact_submissions AUTO_INCREMENT = 100;
+ALTER TABLE schedule_bookings AUTO_INCREMENT = 100;
 
 -- ================================================================
 --  VERIFICATION QUERIES
