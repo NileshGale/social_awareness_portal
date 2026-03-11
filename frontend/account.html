@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Account - Social Awareness Portal</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --navy: #0f2557;
+            --blue: #1e3a8a;
+            --accent: #e84545;
+            --gold: #f0a500;
+            --light: #f8faff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--light);
+            color: #1f2937;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 0.85rem 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h2 {
+            color: var(--navy);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo p {
+            color: #6b7280;
+            font-size: 0.78rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 1.8rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: var(--accent);
+        }
+
+        .nav-btn {
+            background: var(--accent);
+            color: white !important;
+            padding: 0.5rem 1.3rem;
+            border-radius: 50px;
+        }
+
+        .page-content {
+            max-width: 1000px;
+            width: 100%;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            box-sizing: border-box;
+        }
+
+        .not-logged-in {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .not-logged-in i {
+            font-size: 4rem;
+            color: #d1d5db;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .not-logged-in h2 {
+            color: var(--navy);
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 0.8rem;
+        }
+
+        .not-logged-in p {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .btn-login-link {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-login-link:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* PROFILE HEADER */
+        .profile-header {
+            background: linear-gradient(135deg, var(--navy), #1e40af);
+            border-radius: 20px;
+            padding: 2.5rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .avatar-wrap {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar-circle {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            color: white;
+            font-weight: 700;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .avatar-edit-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.65rem;
+            cursor: pointer;
+        }
+
+        .profile-info h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.7rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .profile-info p {
+            opacity: 0.8;
+            font-size: 0.88rem;
+        }
+
+        input[type="file"]#avatarInput {
+            display: none;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.85rem 0.5rem;
+            background: none;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #6b7280;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn:hover {
+            color: var(--accent);
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .tab-btn i {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+            width: 100%;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .card h3 {
+            font-size: 1.05rem;
+            color: var(--navy);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .card h3 i {
+            color: var(--accent);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group.full {
+            grid-column: 1/-1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.83rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.35rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.3s;
+            background: white;
+            color: #1f2937;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--blue);
+        }
+
+        .form-group input[disabled] {
+            background: #f9fafb;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn-save {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-save:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+        }
+
+        .btn-save:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.88rem;
+            display: none;
+        }
+
+        .alert.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .alert.success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        /* UPLOAD INCIDENT */
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        .upload-area:hover {
+            border-color: var(--blue);
+            background: #eff6ff;
+        }
+
+        .upload-area i {
+            font-size: 2.5rem;
+            color: #9ca3af;
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+
+        .upload-area h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        .upload-area p {
+            color: #9ca3af;
+            font-size: 0.83rem;
+        }
+
+        .file-preview {
+            margin-top: 1rem;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .file-preview img,
+        .file-preview video {
+            width: 100%;
+            max-height: 260px;
+            object-fit: cover;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .file-name {
+            margin-top: 0.5rem;
+            font-size: 0.83rem;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .media-clear-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            z-index: 5;
+        }
+
+        .media-clear-btn:hover {
+            background: rgba(220, 38, 38, 0.9);
+        }
+
+        input[type="file"]#mediaInput {
+            display: none;
+        }
+
+        .btn-upload-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-upload-submit:hover {
+            background: #c0392b;
+        }
+
+        .btn-upload-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* UPLOADS GRID (Instagram-style) */
+        .uploads-header {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+
+        .uploads-stat {
+            text-align: center;
+        }
+
+        .uploads-stat .num {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .uploads-stat .lbl {
+            font-size: 0.78rem;
+            color: #6b7280;
+        }
+
+        .uploads-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .upload-thumb {
+            position: relative;
+            aspect-ratio: 1;
+            background: #e5e7eb;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .upload-thumb img,
+        .upload-thumb video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .upload-thumb-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0);
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-thumb:hover .upload-thumb-overlay {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .upload-thumb-overlay span {
+            color: white;
+            font-size: 0.82rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .upload-thumb:hover .upload-thumb-overlay span {
+            opacity: 1;
+        }
+
+        .thumb-actions-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .upload-thumb:hover .thumb-actions-btn {
+            display: flex;
+        }
+
+        /* 3-DOT CONTEXT MENU */
+        .context-menu {
+            position: absolute;
+            top: 36px;
+            right: 6px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 50;
+            display: none;
+            min-width: 140px;
+            overflow: hidden;
+        }
+
+        .context-menu.open {
+            display: block;
+        }
+
+        .ctx-item {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.7rem 1rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: #374151;
+        }
+
+        .ctx-item:hover {
+            background: #f3f4f6;
+        }
+
+        .ctx-item.danger {
+            color: var(--accent);
+        }
+
+        /* UPLOAD MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 2rem 1rem;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            max-width: 560px;
+            width: 100%;
+        }
+
+        .modal-top {
+            padding: 1.5rem 1.8rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .modal-top h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--navy);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+
+        .modal-body {
+            padding: 1.5rem 1.8rem 2rem;
+        }
+
+        .img-full {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        /* LOGOUT */
+        .logout-section {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .logout-section h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--navy);
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+            justify-content: center;
+        }
+
+        .logout-section p {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .btn-logout {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-logout:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(232, 69, 69, 0.3);
+        }
+
+        footer {
+            background: var(--navy);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 2rem;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        footer p {
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        @media(max-width:680px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .uploads-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h2><img src="../assets/logo.jpg" alt="Logo"
+                        style="height: 35px; width: auto; vertical-align: middle; margin-right: 8px;"> Social Awareness
+                    Portal</h2>
+                <p>Creating Awareness for a Better Society</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="awareness-topics.html">Awareness Topics</a></li>
+                <li><a href="campaigns.html">Campaigns</a></li>
+                <li><a href="feedback.html">Feedback</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="account.html" class="nav-btn active">Your Account</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- NOT LOGGED IN STATE -->
+    <div class="page-content" id="notLoggedIn" style="display:none;">
+        <div class="not-logged-in">
+            <i class="fas fa-user-lock"></i>
+            <h2>Please Login to Continue</h2>
+            <p>You need to be logged in to view and manage your account.</p>
+            <a href="login.html" class="btn-login-link">Login Now</a>
+            &nbsp;
+            <a href="registration.html" class="btn-login-link" style="background:var(--navy);">Register</a>
+        </div>
+    </div>
+
+    <!-- LOGGED IN STATE -->
+    <div class="page-content" id="loggedInContent" style="display:none;">
+
+        <!-- PROFILE HEADER -->
+        <div class="profile-header">
+            <div class="avatar-wrap" onclick="document.getElementById('avatarInput').click()">
+                <div class="avatar-circle" id="avatarDisplay">U</div>
+                <div class="avatar-edit-btn"><i class="fas fa-camera"></i></div>
+            </div>
+            <div class="profile-info">
+                <h2 id="profileName">Loading...</h2>
+                <p id="profileEmail">...</p>
+            </div>
+        </div>
+        <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar(this)">
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('profile', this)">
+                <i class="fas fa-user"></i> Your Profile
+            </button>
+            <button class="tab-btn" onclick="switchTab('upload', this)">
+                <i class="fas fa-upload"></i> Upload Incident
+            </button>
+            <button class="tab-btn" onclick="switchTab('myuploads', this)">
+                <i class="fas fa-th"></i> Your Uploads
+            </button>
+            <button class="tab-btn" onclick="switchTab('logout', this)">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+        <!-- ── TAB 1: YOUR PROFILE ── -->
+        <div class="tab-content active" id="tab-profile">
+            <div class="card">
+                <h3><i class="fas fa-user-edit"></i> Update Your Profile</h3>
+                <div id="profile-alert" class="alert"></div>
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>Full Name</label>
+                        <input type="text" id="p-fullname" placeholder="Your full name">
+                    </div>
+                    <div class="form-group full">
+                        <label>Email Address (cannot be changed)</label>
+                        <input type="email" id="p-email" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Mobile Number</label>
+                        <input type="text" id="p-mobile" placeholder="10-digit mobile number" maxlength="15">
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select id="p-gender">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group full">
+                        <label>Date of Birth</label>
+                        <input type="date" id="p-dob">
+                    </div>
+                </div>
+                <div style="margin-top:1.5rem;">
+                    <button class="btn-save" id="profileSaveBtn" onclick="saveProfile()">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── TAB 2: UPLOAD INCIDENT ── -->
+        <div class="tab-content" id="tab-upload">
+            <div class="card">
+                <h3><i class="fas fa-camera"></i> Share an Incident or Campaign</h3>
+                <div id="upload-alert" class="alert"></div>
+                <div style="margin-bottom:1.2rem;">
+                    <label
+                        style="display:block;font-size:0.83rem;font-weight:500;color:#374151;margin-bottom:0.35rem;">Title</label>
+                    <input type="text" id="inc-title" placeholder="Give your post a clear title"
+                        style="width:100%;padding:0.75rem 1rem;border:2px solid #e5e7eb;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.9rem;transition:border-color 0.3s;">
+                </div>
+                <div class="upload-area" onclick="document.getElementById('mediaInput').click()" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h4>Upload Photo or Video</h4>
+                    <p>Click to select or drag and drop — JPG, PNG, MP4</p>
+                </div>
+                <input type="file" id="mediaInput" accept="image/*,video/*" onchange="previewMedia(this)">
+                <div class="file-preview" id="filePreview"></div>
+                <div class="file-name" id="fileName"></div>
+                <div style="margin-top:1.2rem;">
+                    <label
+                        style="display:block;font-size:0.83rem;font-weight:500;color:#374151;margin-bottom:0.35rem;">Description</label>
+                    <textarea id="inc-desc" rows="4" placeholder="Describe the incident or campaign in detail..."
+                        style="width:100%;padding:0.75rem 1rem;border:2px solid #e5e7eb;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.9rem;resize:vertical;"></textarea>
+                </div>
+                <button class="btn-upload-submit" id="uploadBtn" onclick="uploadIncident()">
+                    <i class="fas fa-paper-plane"></i> &nbsp;Upload Post
+                </button>
+            </div>
+        </div>
+
+        <!-- ── TAB 3: YOUR UPLOADS ── -->
+        <div class="tab-content" id="tab-myuploads">
+            <div class="card">
+                <div class="uploads-header">
+                    <div class="uploads-stat">
+                        <div class="num" id="uploadCount">0</div>
+                        <div class="lbl">Posts</div>
+                    </div>
+                    <div class="uploads-stat">
+                        <div class="num" id="totalLikes">0</div>
+                        <div class="lbl">Total Likes</div>
+                    </div>
+                </div>
+                <div class="uploads-grid" id="uploadsGrid">
+                    <div style="grid-column:1/-1;text-align:center;padding:2rem;color:#9ca3af;">
+                        <i class="fas fa-th"
+                            style="font-size:2.5rem;margin-bottom:0.8rem;display:block;opacity:0.4;"></i>
+                        <p>No uploads yet. Share your first incident above.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── TAB 4: LOGOUT ── -->
+        <div class="tab-content" id="tab-logout">
+            <div class="card">
+                <div class="logout-section">
+                    <i class="fas fa-sign-out-alt"
+                        style="font-size:3rem;color:#d1d5db;margin-bottom:1rem;display:block;"></i>
+                    <h3>Logout from Your Account</h3>
+                    <p>You will be returned to the home page after logging out.</p>
+                    <button class="btn-logout" onclick="doLogout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /loggedInContent -->
+
+    <!-- VIEW INCIDENT MODAL -->
+    <div class="modal-overlay" id="incidentModal">
+        <div class="modal">
+            <div class="modal-top">
+                <h3 id="modalTitle">Incident</h3>
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Social Awareness Portal. All rights reserved.</p>
+        <p><i class="fas fa-map-marker-alt"></i> Nagpur, Maharashtra 440016, India</p>
+    </footer>
+
+    <script>
+        let currentUser = null;
+        let myIncidents = [];
+        let openContextId = null;
+
+        // ─── INIT ──────────────────────────────────────────────────────
+        async function init() {
+            try {
+                const res = await fetch('../backend/api.php?action=get_profile');
+                const data = await res.json();
+                if (!data.success) {
+                    document.getElementById('notLoggedIn').style.display = 'block';
+                    return;
+                }
+                currentUser = data.user;
+                // If admin lands on account.html, send them to admin panel
+                if (data.user.is_admin == 1) {
+                    window.location.href = 'admin.html';
+                    return;
+                }
+                document.getElementById('loggedInContent').style.display = 'block';
+                document.getElementById('profileName').textContent = data.user.full_name || 'User';
+                document.getElementById('profileEmail').textContent = data.user.email;
+                // Fill avatar
+                if (data.user.profile_image && data.user.profile_image !== 'default-profile.png') {
+                    document.getElementById('avatarDisplay').innerHTML = `<img src="../uploads/profiles/${data.user.profile_image}" alt="">`;
+                } else {
+                    document.getElementById('avatarDisplay').textContent = (data.user.full_name || 'U').charAt(0).toUpperCase();
+                }
+                // Fill form
+                document.getElementById('p-fullname').value = data.user.full_name || '';
+                document.getElementById('p-email').value = data.user.email || '';
+                document.getElementById('p-mobile').value = data.user.mobile || '';
+                document.getElementById('p-dob').value = data.user.dob || '';
+                document.getElementById('p-gender').value = data.user.gender || 'Male';
+            } catch (e) {
+                document.getElementById('notLoggedIn').style.display = 'block';
+            }
+        }
+
+        // ─── TABS ──────────────────────────────────────────────────────
+        function switchTab(name, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-' + name).classList.add('active');
+            if (name === 'myuploads') loadMyUploads();
+        }
+
+        // ─── PROFILE SAVE ──────────────────────────────────────────────
+        async function saveProfile() {
+            const btn = document.getElementById('profileSaveBtn');
+            btn.disabled = true; btn.textContent = 'Saving...';
+            const fd = new FormData();
+            fd.append('action', 'update_profile');
+            fd.append('full_name', document.getElementById('p-fullname').value);
+            fd.append('mobile', document.getElementById('p-mobile').value);
+            fd.append('dob', document.getElementById('p-dob').value);
+            fd.append('gender', document.getElementById('p-gender').value);
+            try {
+                const res = await fetch('../backend/api.php', { method: 'POST', body: fd });
+                const data = await res.json();
+                showAlert('profile-alert', data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    document.getElementById('profileName').textContent = document.getElementById('p-fullname').value;
+                }
+            } catch (e) { showAlert('profile-alert', 'Server error.', 'error'); }
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+        }
+
+        // ─── AVATAR UPLOAD ─────────────────────────────────────────────
+        async function uploadAvatar(input) {
+            if (!input.files[0]) return;
+            const fd = new FormData();
+            fd.append('action', 'upload_profile_image');
+            fd.append('profile_image', input.files[0]);
+            try {
+                const res = await fetch('../backend/api.php', { method: 'POST', body: fd });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('avatarDisplay').innerHTML = `<img src="../uploads/profiles/${data.filename}" alt="">`;
+                }
+            } catch (e) { }
+        }
+
+        // ─── MEDIA PREVIEW ─────────────────────────────────────────────
+        function previewMedia(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            const preview = document.getElementById('filePreview');
+            reader.onload = e => {
+                const clearBtn = `<button class="media-clear-btn" onclick="clearMedia()" title="Remove"><i class="fas fa-times"></i></button>`;
+                if (file.type.startsWith('image/')) {
+                    preview.innerHTML = clearBtn + `<img src="${e.target.result}" alt="Preview">`;
+                } else {
+                    preview.innerHTML = clearBtn + `<video controls src="${e.target.result}"></video>`;
+                }
+            };
+            reader.readAsDataURL(file);
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('uploadArea').style.display = 'none';
+        }
+
+        function clearMedia() {
+            document.getElementById('mediaInput').value = '';
+            document.getElementById('filePreview').innerHTML = '';
+            document.getElementById('fileName').textContent = '';
+            document.getElementById('uploadArea').style.display = '';
+        }
+
+        // ─── UPLOAD INCIDENT ───────────────────────────────────────────
+        async function uploadIncident() {
+            const btn = document.getElementById('uploadBtn');
+            const title = document.getElementById('inc-title').value.trim();
+            const desc = document.getElementById('inc-desc').value.trim();
+            if (!title || !desc) {
+                showAlert('upload-alert', 'Title and description are required.', 'error');
+                return;
+            }
+            btn.disabled = true; btn.textContent = 'Uploading...';
+            const fd = new FormData();
+            fd.append('action', 'upload_incident');
+            fd.append('title', title);
+            fd.append('description', desc);
+            const mediaFile = document.getElementById('mediaInput').files[0];
+            if (mediaFile) fd.append('media', mediaFile);
+            try {
+                const res = await fetch('../backend/api.php', { method: 'POST', body: fd });
+                const data = await res.json();
+                showAlert('upload-alert', data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    document.getElementById('inc-title').value = '';
+                    document.getElementById('inc-desc').value = '';
+                    clearMedia();
+                }
+            } catch (e) { showAlert('upload-alert', 'Upload failed.', 'error'); }
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> &nbsp;Upload Post';
+        }
+
+        // ─── MY UPLOADS ────────────────────────────────────────────────
+        async function loadMyUploads() {
+            try {
+                const res = await fetch('../backend/api.php?action=get_my_incidents');
+                const data = await res.json();
+                if (!data.success) return;
+                myIncidents = data.incidents || [];
+                const grid = document.getElementById('uploadsGrid');
+                document.getElementById('uploadCount').textContent = myIncidents.length;
+                const totalLikes = myIncidents.reduce((s, i) => s + parseInt(i.likes_count || 0), 0);
+                document.getElementById('totalLikes').textContent = totalLikes;
+                if (myIncidents.length === 0) {
+                    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#9ca3af;">
+                <i class="fas fa-th" style="font-size:2.5rem;margin-bottom:0.8rem;display:block;opacity:0.4;"></i>
+                <p>No uploads yet. Share your first incident above.</p>
+            </div>`;
+                    return;
+                }
+                grid.innerHTML = myIncidents.map((inc, idx) => {
+                    let thumb = `<div style="width:100%;height:100%;background:linear-gradient(135deg,#e5e7eb,#d1d5db);display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:2rem;"><i class="fas fa-image"></i></div>`;
+                    if (inc.media_path && inc.media_type === 'image') {
+                        thumb = `<img src="../uploads/incidents/${inc.media_path}" alt="${inc.title}">`;
+                    } else if (inc.media_path && inc.media_type === 'video') {
+                        thumb = `<video src="../uploads/incidents/${inc.media_path}" style="width:100%;height:100%;object-fit:cover;"></video>`;
+                    }
+                    return `<div class="upload-thumb" id="thumb-${inc.id}">
+                ${thumb}
+                <div class="upload-thumb-overlay" onclick="viewIncident(${idx})">
+                    <span><i class="fas fa-heart"></i> ${inc.likes_count || 0}</span>
+                </div>
+                <button class="thumb-actions-btn" onclick="toggleContext(event,${inc.id})"><i class="fas fa-ellipsis-v"></i></button>
+                <div class="context-menu" id="ctx-${inc.id}">
+                    <div class="ctx-item" onclick="viewIncident(${idx})"><i class="fas fa-eye" style="color:var(--blue);"></i> View</div>
+                    <div class="ctx-item" onclick="downloadIncident('${inc.media_path}','${inc.media_type}')"><i class="fas fa-download" style="color:#16a34a;"></i> Download</div>
+                    <div class="ctx-item danger" onclick="deleteIncident(${inc.id})"><i class="fas fa-trash"></i> Delete</div>
+                </div>
+            </div>`;
+                }).join('');
+            } catch (e) { }
+        }
+
+        function toggleContext(e, id) {
+            e.stopPropagation();
+            const menu = document.getElementById('ctx-' + id);
+            document.querySelectorAll('.context-menu').forEach(m => {
+                if (m !== menu) m.classList.remove('open');
+            });
+            menu.classList.toggle('open');
+        }
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.context-menu').forEach(m => m.classList.remove('open'));
+        });
+
+        function viewIncident(idx) {
+            const inc = myIncidents[idx];
+            document.getElementById('modalTitle').textContent = inc.title;
+            let mediaHTML = '';
+            if (inc.media_path) {
+                if (inc.media_type === 'image') {
+                    mediaHTML = `<img class="img-full" src="../uploads/incidents/${inc.media_path}" alt="">`;
+                } else {
+                    mediaHTML = `<video class="img-full" controls src="../uploads/incidents/${inc.media_path}"></video>`;
+                }
+            }
+            document.getElementById('modalBody').innerHTML = `
+        ${mediaHTML}
+        <p style="color:#374151;line-height:1.7;font-size:0.92rem;">${inc.description}</p>
+        <div style="margin-top:1rem;display:flex;gap:1rem;font-size:0.83rem;color:#9ca3af;">
+            <span><i class="fas fa-heart" style="color:var(--accent);"></i> ${inc.likes_count || 0} likes</span>
+            <span><i class="fas fa-calendar-alt"></i> ${new Date(inc.created_at).toLocaleDateString('en-IN')}</span>
+        </div>`;
+            document.getElementById('incidentModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('incidentModal').classList.remove('active');
+        }
+
+        async function deleteIncident(id) {
+            if (!confirm('Are you sure you want to delete this post? This cannot be undone.')) return;
+            const fd = new FormData();
+            fd.append('action', 'delete_incident');
+            fd.append('incident_id', id);
+            try {
+                const res = await fetch('../backend/api.php', { method: 'POST', body: fd });
+                const data = await res.json();
+                if (data.success) {
+                    loadMyUploads();
+                } else {
+                    alert(data.message || 'Delete failed.');
+                }
+            } catch (e) { }
+        }
+
+        function downloadIncident(mediaPath, mediaType) {
+            if (!mediaPath) { alert('No media file to download.'); return; }
+            const a = document.createElement('a');
+            a.href = `../uploads/incidents/${mediaPath}`;
+            a.download = mediaPath;
+            a.click();
+        }
+
+        // ─── LOGOUT ────────────────────────────────────────────────────
+        async function doLogout() {
+            const fd = new FormData();
+            fd.append('action', 'logout');
+            try {
+                await fetch('../backend/api.php', { method: 'POST', body: fd });
+            } catch (e) { }
+            window.location.href = 'index.html';
+        }
+
+        function showAlert(id, msg, type) {
+            const el = document.getElementById(id);
+            el.textContent = msg;
+            el.className = 'alert ' + type;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 5000);
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

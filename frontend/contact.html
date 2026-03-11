@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Social Awareness Portal</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --navy: #0f2557;
+            --blue: #1e3a8a;
+            --accent: #e84545;
+            --gold: #f0a500;
+            --light: #f8faff;
+            --admin: var(--blue);
+            --admin-light: #eff6ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--light);
+            color: #1f2937;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 0.85rem 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h2 {
+            color: var(--navy);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo p {
+            color: #6b7280;
+            font-size: 0.78rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 1.8rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: var(--accent);
+        }
+
+        .nav-btn {
+            background: var(--accent);
+            color: white !important;
+            padding: 0.5rem 1.3rem;
+            border-radius: 50px;
+        }
+
+        /* Admin Branding */
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: linear-gradient(135deg, var(--navy), var(--blue));
+            color: white;
+            padding: 0.15rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .nav-btn-admin {
+            background: var(--accent) !important;
+            color: white !important;
+            padding: 0.5rem 1.3rem;
+            border-radius: 50px;
+            font-weight: 600 !important;
+            transition: all 0.3s !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn-admin:hover {
+            background: var(--navy) !important;
+            transform: translateY(-2px);
+        }
+
+        .page-hero {
+            background: linear-gradient(135deg, var(--navy), #1e40af);
+            padding: 4rem 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .page-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .page-hero p {
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .contact-section {
+            max-width: 1100px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 3rem;
+        }
+
+        .contact-info h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--navy);
+            margin-bottom: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .info-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #eff6ff;
+            color: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .info-text h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-text p {
+            color: #6b7280;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .emergency-box {
+            background: linear-gradient(135deg, #fef2f2, #fff0f0);
+            border: 2px solid #fecaca;
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .emergency-box h3 {
+            color: var(--accent);
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .emergency-box .em-num {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--navy);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .emergency-box p {
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+
+        .contact-form-wrap {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .contact-form-wrap h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-form-wrap>p {
+            color: #6b7280;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.88rem;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--blue);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group.full {
+            grid-column: 1/-1;
+        }
+
+        .btn-send {
+            width: 100%;
+            padding: 1rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-send:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+        }
+
+        .btn-send:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .alert.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .alert.success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        footer {
+            background: var(--navy);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        footer p {
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        @media(max-width:768px) {
+            .contact-section {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h2><img src="../assets/logo.jpg" alt="Logo"
+                        style="height: 35px; width: auto; vertical-align: middle; margin-right: 8px;"> Social Awareness
+                    Portal</h2>
+                <p>Creating Awareness for a Better Society</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="awareness-topics.html">Awareness Topics</a></li>
+                <li><a href="campaigns.html">Campaigns</a></li>
+                <li><a href="feedback.html">Feedback</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+                <li><a href="account.html" class="nav-btn" id="navAccountBtn">Your Account</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="page-hero">
+        <h1>Contact Us</h1>
+        <p>We're here to help. Reach out to us anytime.</p>
+    </div>
+
+    <div class="contact-section">
+        <div class="contact-info">
+            <h2>Get in Touch</h2>
+            <div class="info-item">
+                <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                <div class="info-text">
+                    <h4>Email Address</h4>
+                    <p>
+                        <a href="mailto:dhanashreegame@gmail.com">dhanashreegame@gmail.com</a><br>
+                        <a href="mailto:nileshgale520@gmail.com">nileshgale520@gmail.com</a>
+                    </p>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="info-text">
+                    <h4>Location</h4>
+                    <p>Nagpur, Maharashtra 440016<br>India</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon"><i class="fas fa-clock"></i></div>
+                <div class="info-text">
+                    <h4>Response Time</h4>
+                    <p>We respond within 24 hours<br>Mon – Sat, 9am – 6pm IST</p>
+                </div>
+            </div>
+            <div class="emergency-box">
+                <h3><i class="fas fa-exclamation-triangle"></i> Emergency Helplines</h3>
+                <div class="em-num">100</div>
+                <p>Police Emergency</p>
+                <div
+                    style="margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.85rem;color:#374151;">
+                    <span><strong>112</strong> — Emergency</span>
+                    <span><strong>1098</strong> — Childline</span>
+                    <span><strong>181</strong> — Women's Help</span>
+                    <span><strong>1930</strong> — Cyber Crime</span>
+                    <span><strong>1860-2662-345</strong> — Mental Health</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-form-wrap">
+            <h2>Send a Message</h2>
+            <p>Have a question, suggestion, or need to report something? We're listening.</p>
+            <div id="contact-alert" class="alert"></div>
+            <form id="contactForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Your Name</label>
+                        <input type="text" id="c-name" placeholder="Full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email Address</label>
+                        <input type="email" id="c-email" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group full">
+                        <label><i class="fas fa-tag"></i> Subject</label>
+                        <select id="c-subject" required>
+                            <option value="">Select subject</option>
+                            <option>General Inquiry</option>
+                            <option>Report an Issue</option>
+                            <option>Suggest a Topic</option>
+                            <option>Campaign Support</option>
+                            <option>Technical Issue</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group full">
+                        <label><i class="fas fa-comment-alt"></i> Message</label>
+                        <textarea id="c-message" rows="6" placeholder="Describe your query or concern in detail..."
+                            required></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn-send" id="sendBtn">
+                    <i class="fas fa-paper-plane"></i> &nbsp;Send Message
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Social Awareness Portal. All rights reserved.</p>
+        <p><i class="fas fa-map-marker-alt"></i> Nagpur, Maharashtra 440016, India</p>
+    </footer>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('sendBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+            const fd = new FormData();
+            fd.append('action', 'submit_contact');
+            fd.append('name', document.getElementById('c-name').value);
+            fd.append('email', document.getElementById('c-email').value);
+            fd.append('subject', document.getElementById('c-subject').value);
+            fd.append('message', document.getElementById('c-message').value);
+
+            try {
+                const res = await fetch('../backend/api.php', { method: 'POST', body: fd });
+                const data = await res.json();
+                const el = document.getElementById('contact-alert');
+                el.textContent = data.message;
+                el.className = `alert ${data.success ? 'success' : 'error'}`;
+                el.style.display = 'block';
+                if (data.success) document.getElementById('contactForm').reset();
+            } catch (err) {
+                const el = document.getElementById('contact-alert');
+                el.textContent = 'Network error. Please check your connection and try again.';
+                el.className = 'alert error';
+                el.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> &nbsp;Send Message';
+            }
+        });
+    </script>
+    <script>
+        function applyAdminBranding() {
+            const logoH2 = document.querySelector('.logo h2');
+            const logoP = document.querySelector('.logo p');
+            const acctBtn = document.getElementById('navAccountBtn');
+            if (logoH2 && !logoH2.querySelector('.admin-badge')) {
+                logoH2.innerHTML += '<span class="admin-badge"><i class="fas fa-shield-alt"></i> admin</span>';
+            }
+            if (logoP) logoP.textContent = 'Administration Panel';
+            if (acctBtn) {
+                acctBtn.href = 'admin.html#account';
+                acctBtn.classList.add('nav-btn-admin');
+                acctBtn.innerHTML = '<i class="fas fa-user-shield"></i> Your Account';
+            }
+            const feedbackLink = document.querySelector('a[href="feedback.html"]');
+            if (feedbackLink) feedbackLink.href = 'admin.html';
+        }
+
+        if (sessionStorage.getItem('is_admin') === '1') applyAdminBranding();
+
+        fetch('../backend/api.php?action=check_session')
+            .then(r => r.json())
+            .then(data => {
+                const isAdmin = data.logged_in && data.user && data.user.is_admin == 1;
+                if (isAdmin) {
+                    sessionStorage.setItem('is_admin', '1');
+                    applyAdminBranding();
+                } else {
+                    sessionStorage.removeItem('is_admin');
+                }
+
+                const btn = document.getElementById('navAccountBtn');
+                if (data.logged_in && btn && !isAdmin) {
+                    btn.href = 'account.html';
+                }
+            }).catch(() => { });
+    </script>
+</body>
+
+</html>

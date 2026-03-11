@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaigns - Social Awareness Portal</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --navy: #0f2557;
+            --blue: #1e3a8a;
+            --accent: #e84545;
+            --gold: #f0a500;
+            --light: #f8faff;
+            --admin: var(--blue);
+            --admin-light: #eff6ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--light);
+            color: #1f2937;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 0.85rem 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h2 {
+            color: var(--navy);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo p {
+            color: #6b7280;
+            font-size: 0.78rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 1.8rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: var(--accent);
+        }
+
+        .nav-btn {
+            background: var(--accent);
+            color: white !important;
+            padding: 0.5rem 1.3rem;
+            border-radius: 50px;
+        }
+
+        /* Admin Branding */
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: linear-gradient(135deg, var(--navy), var(--blue));
+            color: white;
+            padding: 0.15rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .nav-btn-admin {
+            background: var(--accent) !important;
+            color: white !important;
+            padding: 0.5rem 1.3rem;
+            border-radius: 50px;
+            font-weight: 600 !important;
+            transition: all 0.3s !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn-admin:hover {
+            background: var(--navy) !important;
+            transform: translateY(-2px);
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--navy), #1e40af);
+            padding: 3.5rem 2rem;
+            color: white;
+        }
+
+        .header-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .header-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-text p {
+            opacity: 0.8;
+            font-size: 1rem;
+        }
+
+        .campaigns-section {
+            max-width: 700px;
+            margin: 3rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* CAMPAIGN CARD */
+        .campaign-card {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+        }
+
+        .campaign-card:hover {
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .campaign-header {
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--blue), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info h4 {
+            font-size: 0.93rem;
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .user-info span {
+            font-size: 0.78rem;
+            color: #9ca3af;
+        }
+
+        .campaign-badge {
+            margin-left: auto;
+            background: #fef2f2;
+            color: var(--accent);
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.25rem 0.7rem;
+            border-radius: 50px;
+            white-space: nowrap;
+        }
+
+        .campaign-body {
+            padding: 1.2rem 1.5rem;
+        }
+
+        .campaign-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.6rem;
+        }
+
+        .campaign-desc {
+            color: #4b5563;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .see-more {
+            color: var(--blue);
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .campaign-media {
+            overflow: hidden;
+            max-height: 420px;
+        }
+
+        .campaign-media img {
+            width: 100%;
+            max-height: 420px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .campaign-media video {
+            width: 100%;
+            display: block;
+        }
+
+        /* ACTIONS */
+        .campaign-actions {
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #6b7280;
+            font-size: 0.88rem;
+            font-weight: 500;
+            padding: 0.5rem 0.9rem;
+            border-radius: 50px;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .action-btn:hover {
+            background: #f3f4f6;
+            color: var(--navy);
+        }
+
+        .action-btn.liked {
+            color: var(--accent);
+        }
+
+        .action-btn.liked i {
+            color: var(--accent);
+        }
+
+        .action-btn i {
+            font-size: 1rem;
+        }
+
+        .share-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .share-menu {
+            display: none;
+            position: absolute;
+            bottom: 115%;
+            left: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            min-width: 170px;
+            overflow: hidden;
+        }
+
+        .share-menu.open {
+            display: block;
+        }
+
+        .share-item {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.7rem 1.1rem;
+            font-size: 0.87rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            color: #374151;
+        }
+
+        .share-item:hover {
+            background: #f3f4f6;
+        }
+
+        .share-item i {
+            width: 18px;
+            text-align: center;
+        }
+
+        .si-wa {
+            color: #25D366;
+        }
+
+        .si-tw {
+            color: #1DA1F2;
+        }
+
+        .si-ig {
+            color: #E1306C;
+        }
+
+        .si-cp {
+            color: #6b7280;
+        }
+
+        /* COMMENTS */
+        .comment-section {
+            border-top: 1px solid #f3f4f6;
+            padding: 1rem 1.5rem;
+            display: none;
+        }
+
+        .comment-section.open {
+            display: block;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blue), #60a5fa);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .comment-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .comment-content {
+            background: #f8faff;
+            border-radius: 10px;
+            padding: 0.6rem 1rem;
+            flex: 1;
+        }
+
+        .comment-content strong {
+            font-size: 0.82rem;
+            color: var(--navy);
+        }
+
+        .comment-content p {
+            font-size: 0.85rem;
+            color: #4b5563;
+            margin-top: 0.2rem;
+            line-height: 1.5;
+        }
+
+        .comment-input-wrap {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+        }
+
+        .comment-input {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 50px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem;
+            transition: border-color 0.3s;
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: var(--blue);
+        }
+
+        .comment-send {
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+
+        .comment-send:hover {
+            background: var(--navy);
+        }
+
+        .no-comments {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.85rem;
+            padding: 0.8rem 0;
+        }
+
+        /* DIVIDER */
+        .section-divider {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .section-divider span {
+            background: var(--light);
+            padding: 0 1rem;
+            color: #9ca3af;
+            font-size: 0.85rem;
+            position: relative;
+        }
+
+        .section-divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #9ca3af;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+        }
+
+        footer {
+            background: var(--navy);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        footer p {
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        @media(max-width:768px) {
+            .header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h2><img src="../assets/logo.jpg" alt="Logo"
+                        style="height: 35px; width: auto; vertical-align: middle; margin-right: 8px;"> Social Awareness
+                    Portal</h2>
+                <p>Creating Awareness for a Better Society</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="awareness-topics.html">Awareness Topics</a></li>
+                <li><a href="campaigns.html" class="active">Campaigns</a></li>
+                <li><a href="feedback.html">Feedback</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="account.html" class="nav-btn" id="navAccountBtn">Your Account</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="header-inner">
+            <div class="header-text">
+                <h1>Awareness Campaigns</h1>
+                <p>Stories, incidents, and movements shared by our community</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="campaigns-section">
+
+        <!-- ===== 7 STATIC FEATURED CAMPAIGNS ===== -->
+
+        <!-- Campaign 1 -->
+        <div class="campaign-card" id="sc-1">
+            <div class="campaign-header">
+                <div class="user-avatar">SA</div>
+                <div class="user-info">
+                    <h4>Social Awareness Portal</h4>
+                    <span>Official Campaign</span>
+                </div>
+                <span class="campaign-badge">Women Safety</span>
+            </div>
+            <div class="campaign-body">
+                <div class="campaign-title">Know the Signal — Save a Life</div>
+                <div class="campaign-media" style="margin:0.8rem -1.5rem;">
+                    <img src="../uploads/images/women_education.jpg" alt="Women Safety Campaign">
+                </div>
+                <div class="campaign-desc" style="margin-top:0.8rem;">
+                    Every year thousands of women in India are trapped in dangerous situations and cannot call for help.
+                    Learning silent distress signals and knowing the helpline numbers can be the difference between life
+                    and death. Share this with every woman you know. Helpline: 181
+                </div>
+            </div>
+            <div class="campaign-actions">
+                <button class="action-btn" onclick="toggleLike('sc-1', this)">
+                    <i class="far fa-heart"></i> <span class="like-count">247</span>
+                </button>
+                <button class="action-btn" onclick="toggleComment('sc-1')">
+                    <i class="far fa-comment"></i> <span>Comments</span>
+                </button>
+                <div class="share-dropdown">
+                    <button class="action-btn" onclick="toggleShare('sc-1')">
+                        <i class="fas fa-share-alt"></i> <span>Share</span>
+                    </button>
+                    <div class="share-menu" id="share-sc-1">
+                        <a class="share-item" href="#"
+                            onclick="shareToWhatsApp('Know the Signal — Save a Life');return false;"><i
+                                class="fab fa-whatsapp si-wa"></i> WhatsApp</a>
+                        <a class="share-item" href="#"
+                            onclick="shareToTwitter('Know the Signal — Save a Life');return false;"><i
+                                class="fab fa-twitter si-tw"></i> Twitter</a>
+                        <a class="share-item" href="#" onclick="shareToInstagram();return false;"><i
+                                class="fab fa-instagram si-ig"></i> Instagram</a>
+                        <a class="share-item" href="#" onclick="copyLink();return false;"><i
+                                class="fas fa-link si-cp"></i> Copy Link</a>
+                    </div>
+                </div>
+            </div>
+            <div class="comment-section" id="comments-sc-1">
+                <div class="comment-item">
+                    <div class="comment-avatar">P</div>
+                    <div class="comment-content"><strong>Priya M.</strong>
+                        <p>Very important information. I have shared with all my contacts.</p>
+                    </div>
+                </div>
+                <div class="comment-item">
+                    <div class="comment-avatar">A</div>
+                    <div class="comment-content"><strong>Anjali S.</strong>
+                        <p>Every school should teach these signals to girls.</p>
+                    </div>
+                </div>
+                <div class="comment-input-wrap">
+                    <input class="comment-input" placeholder="Write a comment..." id="ci-sc-1">
+                    <button class="comment-send" onclick="addStaticComment('sc-1')"><i
+                            class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaign 2 -->
+        <div class="campaign-card" id="sc-2">
+            <div class="campaign-header">
+                <div class="user-avatar">SA</div>
+                <div class="user-info">
+                    <h4>Social Awareness Portal</h4>
+                    <span>Official Campaign</span>
+                </div>
+                <span class="campaign-badge">Child Protection</span>
+            </div>
+            <div class="campaign-body">
+                <div class="campaign-title">Teach Your Child — Good Touch Bad Touch</div>
+                <div class="campaign-media" style="margin:0.8rem -1.5rem;">
+                    <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=700&q=80"
+                        alt="Child Protection">
+                </div>
+                <div class="campaign-desc" style="margin-top:0.8rem;">
+                    Child sexual abuse affects 1 in 3 children in India. Most victims never speak up because they don't
+                    have the language to describe what happened. Teach your children about body safety, consent, and the
+                    difference between safe and unsafe touch from an early age. Childline: 1098
+                </div>
+            </div>
+            <div class="campaign-actions">
+                <button class="action-btn" onclick="toggleLike('sc-2', this)">
+                    <i class="far fa-heart"></i> <span class="like-count">189</span>
+                </button>
+                <button class="action-btn" onclick="toggleComment('sc-2')">
+                    <i class="far fa-comment"></i> <span>Comments</span>
+                </button>
+                <div class="share-dropdown">
+                    <button class="action-btn" onclick="toggleShare('sc-2')">
+                        <i class="fas fa-share-alt"></i> <span>Share</span>
+                    </button>
+                    <div class="share-menu" id="share-sc-2">
+                        <a class="share-item" href="#"
+                            onclick="shareToWhatsApp('Good Touch Bad Touch awareness');return false;"><i
+                                class="fab fa-whatsapp si-wa"></i> WhatsApp</a>
+                        <a class="share-item" href="#"
+                            onclick="shareToTwitter('Good Touch Bad Touch awareness');return false;"><i
+                                class="fab fa-twitter si-tw"></i> Twitter</a>
+                        <a class="share-item" href="#" onclick="shareToInstagram();return false;"><i
+                                class="fab fa-instagram si-ig"></i> Instagram</a>
+                        <a class="share-item" href="#" onclick="copyLink();return false;"><i
+                                class="fas fa-link si-cp"></i> Copy Link</a>
+                    </div>
+                </div>
+            </div>
+            <div class="comment-section" id="comments-sc-2">
+                <div class="no-comments">No comments yet. Be the first to comment.</div>
+                <div class="comment-input-wrap">
+                    <input class="comment-input" placeholder="Write a comment..." id="ci-sc-2">
+                    <button class="comment-send" onclick="addStaticComment('sc-2')"><i
+                            class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaign 3 -->
+        <div class="campaign-card" id="sc-3">
+            <div class="campaign-header">
+                <div class="user-avatar">SA</div>
+                <div class="user-info">
+                    <h4>Social Awareness Portal</h4>
+                    <span>Official Campaign</span>
+                </div>
+                <span class="campaign-badge">Cyber Safety</span>
+            </div>
+            <div class="campaign-body">
+                <div class="campaign-title">Stop UPI Fraud — Never Share Your OTP</div>
+                <div class="campaign-media" style="margin:0.8rem -1.5rem;">
+                    <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=700&q=80" alt="Cyber Safety">
+                </div>
+                <div class="campaign-desc" style="margin-top:0.8rem;">
+                    India reported over 50,000 cyber fraud cases in 2024. Fraudsters pose as bank officials, government
+                    officers, or lottery agents to steal your money. REMEMBER: No bank, government office, or UPI app
+                    will ever ask for your OTP, PIN, or password. Report cyber fraud at 1930 immediately.
+                </div>
+            </div>
+            <div class="campaign-actions">
+                <button class="action-btn" onclick="toggleLike('sc-3', this)">
+                    <i class="far fa-heart"></i> <span class="like-count">312</span>
+                </button>
+                <button class="action-btn" onclick="toggleComment('sc-3')">
+                    <i class="far fa-comment"></i> <span>Comments</span>
+                </button>
+                <div class="share-dropdown">
+                    <button class="action-btn" onclick="toggleShare('sc-3')">
+                        <i class="fas fa-share-alt"></i> <span>Share</span>
+                    </button>
+                    <div class="share-menu" id="share-sc-3">
+                        <a class="share-item" href="#"
+                            onclick="shareToWhatsApp('Stop UPI Fraud — Never Share Your OTP');return false;"><i
+                                class="fab fa-whatsapp si-wa"></i> WhatsApp</a>
+                        <a class="share-item" href="#"
+                            onclick="shareToTwitter('Stop UPI Fraud — Never Share Your OTP');return false;"><i
+                                class="fab fa-twitter si-tw"></i> Twitter</a>
+                        <a class="share-item" href="#" onclick="shareToInstagram();return false;"><i
+                                class="fab fa-instagram si-ig"></i> Instagram</a>
+                        <a class="share-item" href="#" onclick="copyLink();return false;"><i
+                                class="fas fa-link si-cp"></i> Copy Link</a>
+                    </div>
+                </div>
+            </div>
+            <div class="comment-section" id="comments-sc-3">
+                <div class="no-comments">No comments yet. Be the first to comment.</div>
+                <div class="comment-input-wrap">
+                    <input class="comment-input" placeholder="Write a comment..." id="ci-sc-3">
+                    <button class="comment-send" onclick="addStaticComment('sc-3')"><i
+                            class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaign 4 -->
+        <div class="campaign-card" id="sc-4">
+            <div class="campaign-header">
+                <div class="user-avatar">SA</div>
+                <div class="user-info">
+                    <h4>Social Awareness Portal</h4>
+                    <span>Official Campaign</span>
+                </div>
+                <span class="campaign-badge">Mental Health</span>
+            </div>
+            <div class="campaign-body">
+                <div class="campaign-title">It is Okay to Not Be Okay — Seek Help</div>
+                <div class="campaign-media" style="margin:0.8rem -1.5rem;">
+                    <img src="https://images.unsplash.com/photo-1527137342181-19aab11a8ee8?w=700&q=80"
+                        alt="Mental Health">
+                </div>
+                <div class="campaign-desc" style="margin-top:0.8rem;">
+                    India has a mental health crisis — over 150 million people need care, but only 3 in 10 ever seek
+                    help. The stigma around mental illness is literally costing lives. Talking about your struggles is a
+                    sign of strength, not weakness. If you or someone you know is struggling, call iCall: 9152987821.
+                    You are not alone.
+                </div>
+            </div>
+            <div class="campaign-actions">
+                <button class="action-btn" onclick="toggleLike('sc-4', this)">
+                    <i class="far fa-heart"></i> <span class="like-count">428</span>
+                </button>
+                <button class="action-btn" onclick="toggleComment('sc-4')">
+                    <i class="far fa-comment"></i> <span>Comments</span>
+                </button>
+                <div class="share-dropdown">
+                    <button class="action-btn" onclick="toggleShare('sc-4')">
+                        <i class="fas fa-share-alt"></i> <span>Share</span>
+                    </button>
+                    <div class="share-menu" id="share-sc-4">
+                        <a class="share-item" href="#"
+                            onclick="shareToWhatsApp('Mental Health Awareness');return false;"><i
+                                class="fab fa-whatsapp si-wa"></i> WhatsApp</a>
+                        <a class="share-item" href="#"
+                            onclick="shareToTwitter('Mental Health Awareness');return false;"><i
+                                class="fab fa-twitter si-tw"></i> Twitter</a>
+                        <a class="share-item" href="#" onclick="shareToInstagram();return false;"><i
+                                class="fab fa-instagram si-ig"></i> Instagram</a>
+                        <a class="share-item" href="#" onclick="copyLink();return false;"><i
+                                class="fas fa-link si-cp"></i> Copy Link</a>
+                    </div>
+                </div>
+            </div>
+            <div class="comment-section" id="comments-sc-4">
+                <div class="comment-item">
+                    <div class="comment-avatar">R</div>
+                    <div class="comment-content"><strong>Rahul K.</strong>
+                        <p>Thank you for posting this. Mental health is so important. We need more awareness like this.
+                        </p>
+                    </div>
+                </div>
+                <div class="comment-input-wrap">
+                    <input class="comment-input" placeholder="Write a comment..." id="ci-sc-4">
+                    <button class="comment-send" onclick="addStaticComment('sc-4')"><i
+                            class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaign 5 -->
+        <div class="campaign-card" id="sc-5">
+            <div class="campaign-header">
+                <div class="user-avatar">SA</div>
+                <div class="user-info">
+                    <h4>Social Awareness Portal</h4>
+                    <span>Official Campaign</span>
+                </div>
+                <span class="campaign-badge">Social Evils</span>
+            </div>
+            <div class="campaign-body">
+                <div class="campaign-title">Dowry is a Crime — Stand Against It</div>
+                <div class="campaign-media" style="margin:0.8rem -1.5rem;">
+                    <img src="https://images.unsplash.com/photo-1594739797576-cede97e5a4e9?w=700&q=80"
+                        alt="Anti-Dowry Campaign">
+                </div>
+                <div class="campaign-desc" style="margin-top:0.8rem;">
+                    Every 90 minutes, a woman in India dies due to dowry-related violence. The Dowry Prohibition Act
+                    1961 makes giving and taking dowry a criminal offense with up to 5 years imprisonment. If you are
+                    facing dowry demands or harassment, you are not alone. Contact the One Stop Centre at 181 or file an
+                    FIR under IPC 304B.
+                </div>
+            </div>
+            <div class="campaign-actions">
+                <button class="action-btn" onclick="toggleLike('sc-5', this)">
+                    <i class="far fa-heart"></i> <span class="like-count">156</span>
+                </button>
+                <button class="action-btn" onclick="toggleComment('sc-5')">
+                    <i class="far fa-comment"></i> <span>Comments</span>
+                </button>
+                <div class="share-dropdown">
+                    <button class="action-btn" onclick="toggleShare('sc-5')">
+                        <i class="fas fa-share-alt"></i> <span>Share</span>
+                    </button>
+                    <div class="share-menu" id="share-sc-5">
+                        <a class="share-item" href="#" onclick="shareToWhatsApp('Dowry is a Crime');return false;"><i
+                                class="fab fa-whatsapp si-wa"></i> WhatsApp</a>
+                        <a class="share-item" href="#" onclick="shareToTwitter('Dowry is a Crime');return false;"><i
+                                class="fab fa-twitter si-tw"></i> Twitter</a>
+                        <a class="share-item" href="#" onclick="shareToInstagram();return false;"><i
+                                class="fab fa-instagram si-ig"></i> Instagram</a>
+                        <a class="share-item" href="#" onclick="copyLink();return false;"><i
+                                class="fas fa-link si-cp"></i> Copy Link</a>
+                    </div>
+                </div>
+            </div>
+            <div class="comment-section" id="comments-sc-5">
+                <div class="no-comments">No comments yet. Be the first to comment.</div>
+                <div class="comment-input-wrap">
+                    <input class="comment-input" placeholder="Write a comment..." id="ci-sc-5">
+                    <button class="comment-send" onclick="addStaticComment('sc-5')"><i
+                            class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaign 6 -->
+        <div class="campaign-card" id="sc-6">
+            <div class="campaign-header">
+                <div class="user-avatar">SA</div>
+                <div class="user-info">
+                    <h4>Social Awareness Portal</h4>
+                    <span>Official Campaign</span>
+                </div>
+                <span class="campaign-badge">Environment</span>
+            </div>
+            <div class="campaign-body">
+                <div class="campaign-title">Plastic-Free Nagpur — Our Responsibility</div>
+                <div class="campaign-media" style="margin:0.8rem -1.5rem;">
+                    <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=700&q=80"
+                        alt="Plastic Free Campaign">
+                </div>
+                <div class="campaign-desc" style="margin-top:0.8rem;">
+                    Nagpur generates over 1,100 tons of waste daily — much of it plastic that chokes our rivers, lakes,
+                    and soil. A plastic-free Nagpur is possible if each one of us acts today. Carry cloth bags, refuse
+                    single-use plastic, and segregate your waste. Every small step adds up to a cleaner, healthier city
+                    for our children.
+                </div>
+            </div>
+            <div class="campaign-actions">
+                <button class="action-btn" onclick="toggleLike('sc-6', this)">
+                    <i class="far fa-heart"></i> <span class="like-count">203</span>
+                </button>
+                <button class="action-btn" onclick="toggleComment('sc-6')">
+                    <i class="far fa-comment"></i> <span>Comments</span>
+                </button>
+                <div class="share-dropdown">
+                    <button class="action-btn" onclick="toggleShare('sc-6')">
+                        <i class="fas fa-share-alt"></i> <span>Share</span>
+                    </button>
+                    <div class="share-menu" id="share-sc-6">
+                        <a class="share-item" href="#"
+                            onclick="shareToWhatsApp('Plastic Free Nagpur Campaign');return false;"><i
+                                class="fab fa-whatsapp si-wa"></i> WhatsApp</a>
+                        <a class="share-item" href="#"
+                            onclick="shareToTwitter('Plastic Free Nagpur Campaign');return false;"><i
+                                class="fab fa-twitter si-tw"></i> Twitter</a>
+                        <a class="share-item" href="#" onclick="shareToInstagram();return false;"><i
+                                class="fab fa-instagram si-ig"></i> Instagram</a>
+                        <a class="share-item" href="#" onclick="copyLink();return false;"><i
+                                class="fas fa-link si-cp"></i> Copy Link</a>
+                    </div>
+                </div>
+            </div>
+            <div class="comment-section" id="comments-sc-6">
+                <div class="no-comments">No comments yet. Be the first to comment.</div>
+                <div class="comment-input-wrap">
+                    <input class="comment-input" placeholder="Write a comment..." id="ci-sc-6">
+                    <button class="comment-send" onclick="addStaticComment('sc-6')"><i
+                            class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaign 7 -->
+        <div class="campaign-card" id="sc-7">
+            <div class="campaign-header">
+                <div class="user-avatar">SA</div>
+                <div class="user-info">
+                    <h4>Social Awareness Portal</h4>
+                    <span>Official Campaign</span>
+                </div>
+                <span class="campaign-badge">Education</span>
+            </div>
+            <div class="campaign-body">
+                <div class="campaign-title">Education is Every Child's Right — No Child Left Behind</div>
+                <div class="campaign-media" style="margin:0.8rem -1.5rem;">
+                    <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=700&q=80"
+                        alt="Education Campaign">
+                </div>
+                <div class="campaign-desc" style="margin-top:0.8rem;">
+                    The Right to Education Act guarantees free and compulsory education to every child aged 6–14 in
+                    India. Yet millions of children — especially girls and children from marginalized communities — are
+                    denied this right every day. If you know a child who is not in school, report to the District
+                    Education Officer or call 1098. Every child deserves to learn.
+                </div>
+            </div>
+            <div class="campaign-actions">
+                <button class="action-btn" onclick="toggleLike('sc-7', this)">
+                    <i class="far fa-heart"></i> <span class="like-count">381</span>
+                </button>
+                <button class="action-btn" onclick="toggleComment('sc-7')">
+                    <i class="far fa-comment"></i> <span>Comments</span>
+                </button>
+                <div class="share-dropdown">
+                    <button class="action-btn" onclick="toggleShare('sc-7')">
+                        <i class="fas fa-share-alt"></i> <span>Share</span>
+                    </button>
+                    <div class="share-menu" id="share-sc-7">
+                        <a class="share-item" href="#"
+                            onclick="shareToWhatsApp('Education is Every Child Right');return false;"><i
+                                class="fab fa-whatsapp si-wa"></i> WhatsApp</a>
+                        <a class="share-item" href="#"
+                            onclick="shareToTwitter('Education is Every Child Right');return false;"><i
+                                class="fab fa-twitter si-tw"></i> Twitter</a>
+                        <a class="share-item" href="#" onclick="shareToInstagram();return false;"><i
+                                class="fab fa-instagram si-ig"></i> Instagram</a>
+                        <a class="share-item" href="#" onclick="copyLink();return false;"><i
+                                class="fas fa-link si-cp"></i> Copy Link</a>
+                    </div>
+                </div>
+            </div>
+            <div class="comment-section" id="comments-sc-7">
+                <div class="comment-item">
+                    <div class="comment-avatar">S</div>
+                    <div class="comment-content"><strong>Sneha G.</strong>
+                        <p>Education changes everything. Every child must go to school.</p>
+                    </div>
+                </div>
+                <div class="comment-input-wrap">
+                    <input class="comment-input" placeholder="Write a comment..." id="ci-sc-7">
+                    <button class="comment-send" onclick="addStaticComment('sc-7')"><i
+                            class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIVIDER: Community Uploads -->
+        <div class="section-divider" style="position:relative;text-align:center;margin:2rem 0;">
+            <hr style="border:none;border-top:2px solid #e5e7eb;">
+            <span
+                style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--light);padding:0 1.2rem;color:#9ca3af;font-size:0.85rem;font-weight:500;white-space:nowrap;">Community
+                Uploads</span>
+        </div>
+
+        <!-- DYNAMIC CAMPAIGNS FROM DB -->
+        <div id="dynamic-campaigns">
+            <div class="empty-state">
+                <i class="fas fa-camera"></i>
+                <p>Community campaigns will appear here. Login and share your incident from Your Account.</p>
+            </div>
+        </div>
+
+    </div><!-- /campaigns-section -->
+
+    <footer>
+        <p>&copy; 2026 Social Awareness Portal. All rights reserved.</p>
+        <p><i class="fas fa-map-marker-alt"></i> Nagpur, Maharashtra 440016, India</p>
+    </footer>
+
+    <script>
+        // ─── LIKE TOGGLE ───────────────────────────────────────────────
+        function toggleLike(id, btn) {
+            const countEl = btn.querySelector('.like-count');
+            const icon = btn.querySelector('i');
+            let count = parseInt(countEl.textContent);
+            if (btn.classList.contains('liked')) {
+                btn.classList.remove('liked');
+                icon.className = 'far fa-heart';
+                countEl.textContent = count - 1;
+            } else {
+                btn.classList.add('liked');
+                icon.className = 'fas fa-heart';
+                countEl.textContent = count + 1;
+            }
+        }
+
+        // ─── COMMENT TOGGLE ────────────────────────────────────────────
+        function toggleComment(id) {
+            const section = document.getElementById('comments-' + id);
+            section.classList.toggle('open');
+        }
+
+        function addStaticComment(id) {
+            const input = document.getElementById('ci-' + id);
+            const text = input.value.trim();
+            if (!text) return;
+            const section = document.getElementById('comments-' + id);
+            const noComment = section.querySelector('.no-comments');
+            if (noComment) noComment.remove();
+            const wrap = section.querySelector('.comment-input-wrap');
+            const div = document.createElement('div');
+            div.className = 'comment-item';
+            div.innerHTML = `<div class="comment-avatar">Y</div><div class="comment-content"><strong>You</strong><p>${text}</p></div>`;
+            section.insertBefore(div, wrap);
+            input.value = '';
+        }
+
+        // ─── SHARE ─────────────────────────────────────────────────────
+        function toggleShare(id) {
+            const menu = document.getElementById('share-' + id);
+            document.querySelectorAll('.share-menu').forEach(m => {
+                if (m !== menu) m.classList.remove('open');
+            });
+            menu.classList.toggle('open');
+        }
+
+        function shareToWhatsApp(title) {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent(title + ' — Social Awareness Portal\n' + window.location.href);
+            window.open('https://wa.me/?text=' + text, '_blank');
+            document.querySelectorAll('.share-menu').forEach(m => m.classList.remove('open'));
+        }
+
+        function shareToTwitter(title) {
+            const text = encodeURIComponent(title + ' — Social Awareness Portal');
+            const url = encodeURIComponent(window.location.href);
+            window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
+            document.querySelectorAll('.share-menu').forEach(m => m.classList.remove('open'));
+        }
+
+        function shareToInstagram() {
+            copyLink();
+            alert('Link copied! Open Instagram and paste the link in your story or bio.');
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('Link copied to clipboard!');
+            });
+            document.querySelectorAll('.share-menu').forEach(m => m.classList.remove('open'));
+        }
+
+        // Close share menus on outside click
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.share-dropdown')) {
+                document.querySelectorAll('.share-menu').forEach(m => m.classList.remove('open'));
+            }
+        });
+
+        // ─── DYNAMIC CAMPAIGNS FROM DB ─────────────────────────────────
+        async function loadDynamicCampaigns() {
+            try {
+                const res = await fetch('../backend/api.php?action=get_campaigns');
+                const data = await res.json();
+                if (data.success && data.campaigns && data.campaigns.length > 0) {
+                    const container = document.getElementById('dynamic-campaigns');
+                    container.innerHTML = '';
+                    data.campaigns.forEach(c => {
+                        container.innerHTML += buildCampaignCard(c);
+                    });
+                }
+            } catch (e) { console.log('Could not load campaigns from DB'); }
+        }
+
+        function buildCampaignCard(c) {
+            const initials = c.full_name ? c.full_name.charAt(0).toUpperCase() : 'U';
+            const avatar = c.profile_image && c.profile_image !== 'default-profile.png'
+                ? `<img src="../uploads/profiles/${c.profile_image}" alt="">`
+                : initials;
+            const timeAgo = formatTimeAgo(c.created_at);
+            let mediaHTML = '';
+            if (c.media_path) {
+                if (c.media_type === 'image') {
+                    mediaHTML = `<div class="campaign-media" style="margin:0.8rem -1.5rem;"><img src="../uploads/incidents/${c.media_path}" alt="Campaign Media"></div>`;
+                } else if (c.media_type === 'video') {
+                    mediaHTML = `<div class="campaign-media" style="margin:0.8rem -1.5rem;"><video controls><source src="../uploads/incidents/${c.media_path}"></video></div>`;
+                }
+            }
+            const likedClass = c.user_liked > 0 ? 'liked' : '';
+            const heartIcon = c.user_liked > 0 ? 'fas' : 'far';
+            return `
+    <div class="campaign-card" id="dc-${c.id}">
+        <div class="campaign-header">
+            <div class="user-avatar">${avatar}</div>
+            <div class="user-info">
+                <h4>${c.full_name || 'Community Member'}</h4>
+                <span>${timeAgo}</span>
+            </div>
+        </div>
+        <div class="campaign-body">
+            <div class="campaign-title">${c.title}</div>
+            ${mediaHTML}
+            <div class="campaign-desc" style="margin-top:0.8rem;">${c.description}</div>
+        </div>
+        <div class="campaign-actions">
+            <button class="action-btn ${likedClass}" onclick="likeDBCampaign(${c.id}, this)">
+                <i class="${heartIcon} fa-heart"></i> <span class="like-count">${c.likes_count}</span>
+            </button>
+            <button class="action-btn" onclick="toggleComment('dc-${c.id}')">
+                <i class="far fa-comment"></i> <span>${c.comments_count}</span>
+            </button>
+            <div class="share-dropdown">
+                <button class="action-btn" onclick="toggleShare('dc-${c.id}')">
+                    <i class="fas fa-share-alt"></i> <span>Share</span>
+                </button>
+                <div class="share-menu" id="share-dc-${c.id}">
+                    <a class="share-item" href="#" onclick="shareToWhatsApp('${c.title.replace(/'/g, "\\'")}');return false;"><i class="fab fa-whatsapp si-wa"></i> WhatsApp</a>
+                    <a class="share-item" href="#" onclick="shareToTwitter('${c.title.replace(/'/g, "\\'")}');return false;"><i class="fab fa-twitter si-tw"></i> Twitter</a>
+                    <a class="share-item" href="#" onclick="shareToInstagram();return false;"><i class="fab fa-instagram si-ig"></i> Instagram</a>
+                    <a class="share-item" href="#" onclick="copyLink();return false;"><i class="fas fa-link si-cp"></i> Copy Link</a>
+                </div>
+            </div>
+        </div>
+        <div class="comment-section" id="comments-dc-${c.id}">
+            <div class="no-comments">No comments yet.</div>
+            <div class="comment-input-wrap">
+                <input class="comment-input" placeholder="Write a comment..." id="ci-dc-${c.id}">
+                <button class="comment-send" onclick="addDBComment(${c.id})"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>`;
+        }
+
+        async function likeDBCampaign(id, btn) {
+            const fd = new FormData();
+            fd.append('action', 'like_campaign');
+            fd.append('campaign_id', id);
+            try {
+                const res = await fetch('../backend/api.php', { method: 'POST', body: fd });
+                const data = await res.json();
+                if (data.success) {
+                    const countEl = btn.querySelector('.like-count');
+                    const icon = btn.querySelector('i');
+                    countEl.textContent = data.count;
+                    if (data.liked) {
+                        btn.classList.add('liked');
+                        icon.className = 'fas fa-heart';
+                    } else {
+                        btn.classList.remove('liked');
+                        icon.className = 'far fa-heart';
+                    }
+                } else {
+                    alert(data.message || 'Please login to like.');
+                }
+            } catch (e) { }
+        }
+
+        async function addDBComment(campaignId) {
+            const input = document.getElementById('ci-dc-' + campaignId);
+            const text = input.value.trim();
+            if (!text) return;
+            const fd = new FormData();
+            fd.append('action', 'add_comment');
+            fd.append('campaign_id', campaignId);
+            fd.append('comment', text);
+            try {
+                const res = await fetch('../backend/api.php', { method: 'POST', body: fd });
+                const data = await res.json();
+                if (data.success && data.comment) {
+                    const section = document.getElementById('comments-dc-' + campaignId);
+                    const noC = section.querySelector('.no-comments');
+                    if (noC) noC.remove();
+                    const wrap = section.querySelector('.comment-input-wrap');
+                    const div = document.createElement('div');
+                    div.className = 'comment-item';
+                    const initials = data.comment.full_name ? data.comment.full_name.charAt(0) : 'U';
+                    div.innerHTML = `<div class="comment-avatar">${initials}</div><div class="comment-content"><strong>${data.comment.full_name}</strong><p>${data.comment.comment}</p></div>`;
+                    section.insertBefore(div, wrap);
+                    input.value = '';
+                } else {
+                    alert(data.message || 'Please login to comment.');
+                }
+            } catch (e) { }
+        }
+
+        function formatTimeAgo(dateStr) {
+            const diff = (new Date() - new Date(dateStr)) / 1000;
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            return Math.floor(diff / 86400) + 'd ago';
+        }
+
+        loadDynamicCampaigns();
+    </script>
+    <script>
+        function applyAdminBranding() {
+            const logoH2 = document.querySelector('.logo h2');
+            const logoP = document.querySelector('.logo p');
+            const acctBtn = document.getElementById('navAccountBtn');
+            if (logoH2 && !logoH2.querySelector('.admin-badge')) {
+                logoH2.innerHTML += '<span class="admin-badge"><i class="fas fa-shield-alt"></i> admin</span>';
+            }
+            if (logoP) logoP.textContent = 'Administration Panel';
+            if (acctBtn) {
+                acctBtn.href = 'admin.html#account';
+                acctBtn.classList.add('nav-btn-admin');
+                acctBtn.innerHTML = '<i class="fas fa-user-shield"></i> Your Account';
+            }
+            const feedbackLink = document.querySelector('a[href="feedback.html"]');
+            if (feedbackLink) feedbackLink.href = 'admin.html';
+            const contactLi = document.querySelector('a[href="contact.html"]')?.parentElement;
+            if (contactLi) contactLi.style.display = 'none';
+        }
+
+        if (sessionStorage.getItem('is_admin') === '1') applyAdminBranding();
+
+        fetch('../backend/api.php?action=check_session')
+            .then(r => r.json())
+            .then(data => {
+                const isAdmin = data.logged_in && data.user && data.user.is_admin == 1;
+                if (isAdmin) {
+                    sessionStorage.setItem('is_admin', '1');
+                    applyAdminBranding();
+                } else {
+                    sessionStorage.removeItem('is_admin');
+                }
+
+                const btn = document.getElementById('navAccountBtn');
+                if (data.logged_in && btn && !isAdmin) {
+                    btn.href = 'account.html';
+                }
+            }).catch(() => { });
+    </script>
+</body>
+
+</html>

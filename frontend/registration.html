@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Social Awareness Portal</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --navy: #0f2557;
+            --blue: #1e3a8a;
+            --accent: #e84545;
+            --gold: #f0a500;
+            --light: #f8faff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--light);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: white;
+            padding: 0.85rem 2rem;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h2 {
+            color: var(--navy);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo p {
+            color: #6b7280;
+            font-size: 0.78rem;
+        }
+
+        .nav-back {
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-back:hover {
+            color: var(--accent);
+        }
+
+        .page-wrap {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        .side-panel {
+            width: 420px;
+            flex-shrink: 0;
+            background: linear-gradient(160deg, var(--navy) 0%, #1e40af 100%);
+            padding: 3rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .side-panel h2 {
+            font-family: 'Playfair Display', serif;
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .side-panel p {
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        .side-features {
+            list-style: none;
+        }
+
+        .side-features li {
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .side-features li i {
+            color: var(--gold);
+            width: 20px;
+        }
+
+        .form-panel {
+            flex: 1;
+            padding: 3rem 3rem;
+            overflow-y: auto;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .form-inner {
+            max-width: 540px;
+            width: 100%;
+        }
+
+        .form-inner h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-inner>p {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.88rem;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            color: #1f2937;
+            transition: border-color 0.3s;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--blue);
+        }
+
+        .form-group.full {
+            grid-column: 1/-1;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon input {
+            padding-right: 2.8rem;
+        }
+
+        .input-with-icon .eye-btn {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.9rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .login-link a {
+            color: var(--blue);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .alert {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .alert.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .alert.success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert.warning {
+            background: #fffbeb;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .otp-wrap {
+            text-align: center;
+        }
+
+        .otp-wrap i {
+            font-size: 3rem;
+            color: var(--blue);
+            margin-bottom: 1rem;
+        }
+
+        .otp-wrap h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--navy);
+        }
+
+        .otp-wrap p {
+            color: #6b7280;
+            margin: 0.8rem 0 2rem;
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .otp-inputs input {
+            width: 52px;
+            height: 60px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            color: var(--navy);
+            transition: border-color 0.3s;
+        }
+
+        .otp-inputs input:focus {
+            outline: none;
+            border-color: var(--blue);
+        }
+
+        .resend-btn {
+            background: none;
+            border: none;
+            color: var(--blue);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        @media(max-width:900px) {
+            .side-panel {
+                display: none;
+            }
+
+            .form-panel {
+                padding: 2rem 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <h2><img src="../assets/logo.jpg" alt="Logo"
+                    style="height: 35px; width: auto; vertical-align: middle; margin-right: 8px;"> Social Awareness
+                Portal</h2>
+            <p>Creating Awareness for a Better Society</p>
+        </div>
+        <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
+    </nav>
+
+    <div class="page-wrap">
+        <div class="side-panel">
+            <h2>Join Our Community</h2>
+            <p>Become part of the movement to create a safer, more equitable society for everyone.</p>
+            <ul class="side-features">
+                <li><i class="fas fa-check-circle"></i> Access 10+ awareness topics</li>
+                <li><i class="fas fa-check-circle"></i> Share your campaigns & stories</li>
+                <li><i class="fas fa-check-circle"></i> Connect with like-minded people</li>
+                <li><i class="fas fa-check-circle"></i> Report incidents safely</li>
+                <li><i class="fas fa-check-circle"></i> Access helpline resources 24/7</li>
+                <li><i class="fas fa-check-circle"></i> OTP-verified secure registration</li>
+            </ul>
+        </div>
+
+        <div class="form-panel">
+            <div class="form-inner">
+
+                <!-- Step 1: Registration Form -->
+                <div class="form-step active" id="step1">
+                    <h3>Create Account</h3>
+                    <p>Fill in your details to get started</p>
+                    <div id="reg-alert" class="alert"></div>
+                    <form id="regForm">
+                        <div class="form-grid">
+                            <div class="form-group full">
+                                <label><i class="fas fa-user"></i> Full Name</label>
+                                <input type="text" id="full_name" placeholder="Your full name" required>
+                            </div>
+                            <div class="form-group full">
+                                <label><i class="fas fa-envelope"></i> Email Address</label>
+                                <input type="email" id="email" placeholder="your@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-phone"></i> Mobile Number</label>
+                                <input type="tel" id="mobile" placeholder="+91 XXXXX XXXXX" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date of Birth</label>
+                                <input type="date" id="dob" required>
+                            </div>
+                            <div class="form-group full">
+                                <label><i class="fas fa-venus-mars"></i> Gender</label>
+                                <select id="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group full">
+                                <label><i class="fas fa-lock"></i> Password</label>
+                                <div class="input-with-icon">
+                                    <input type="password" id="password" placeholder="Min 8 characters" required
+                                        minlength="8">
+                                    <button type="button" class="eye-btn" onclick="togglePass('password',this)"><i
+                                            class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                            <div class="form-group full">
+                                <label><i class="fas fa-lock"></i> Confirm Password</label>
+                                <div class="input-with-icon">
+                                    <input type="password" id="confirm_password" placeholder="Repeat password" required>
+                                    <button type="button" class="eye-btn"
+                                        onclick="togglePass('confirm_password',this)"><i
+                                            class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit" id="regBtn">
+                            <i class="fas fa-paper-plane"></i> Send OTP & Register
+                        </button>
+                    </form>
+                    <div class="login-link">Already have an account? <a href="login.html">Login here</a></div>
+                </div>
+
+                <!-- Step 2: OTP Verification -->
+                <div class="form-step" id="step2">
+                    <div class="otp-wrap">
+                        <i class="fas fa-envelope-open-text"></i>
+                        <h3>Verify Your Email</h3>
+                        <p id="otp-email-msg">We sent a 6-digit OTP to your email address.</p>
+                        <div id="otp-alert" class="alert"></div>
+                        <div id="dev-otp-box"
+                            style="display:none;background:#fffbeb;border:2px solid #f59e0b;border-radius:12px;padding:1rem 1.5rem;margin:1rem 0;text-align:center;">
+                            <p style="color:#92400e;font-weight:600;margin-bottom:0.5rem;"><i
+                                    class="fas fa-exclamation-triangle"></i> Dev Mode — Email Not Sent</p>
+                            <p style="color:#78350f;font-size:0.85rem;margin-bottom:0.8rem;">Your OTP is shown below.
+                                Set up PHPMailer for production use.</p>
+                            <div id="dev-otp-value"
+                                style="font-size:2.5rem;font-weight:700;color:#1e3a8a;letter-spacing:8px;"></div>
+                        </div>
+                        <div class="otp-inputs" id="otpInputs">
+                            <input type="text" maxlength="1" class="otp-digit">
+                            <input type="text" maxlength="1" class="otp-digit">
+                            <input type="text" maxlength="1" class="otp-digit">
+                            <input type="text" maxlength="1" class="otp-digit">
+                            <input type="text" maxlength="1" class="otp-digit">
+                            <input type="text" maxlength="1" class="otp-digit">
+                        </div>
+                        <button class="btn-submit" id="verifyBtn" onclick="verifyOTP()">
+                            <i class="fas fa-check-circle"></i> Verify & Create Account
+                        </button>
+                        <p style="margin-top:1.2rem;color:#6b7280;font-size:0.9rem;">
+                            Didn't receive it? <button class="resend-btn" onclick="resendOTP()">Resend OTP</button>
+                        </p>
+                        <p style="margin-top:1rem;"><a href="#" onclick="goBack()"
+                                style="color:var(--blue);font-size:0.9rem;">Back to registration</a></p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── API PATH AUTO-DETECT ───────────────────────────────────────
+        // Tries multiple paths based on your folder structure.
+        // If your project root has frontend/ and backend/ folders: ../backend/api.php
+        // If all files are in one folder: api.php
+        // If backend is in same folder: backend/api.php
+        const API_PATHS = [
+            '../backend/api.php',   // standard: frontend/ + backend/ sibling folders
+            'api.php',              // all files in one folder
+            'backend/api.php',      // backend subfolder inside same folder
+        ];
+
+        let API_URL = null;
+        let userEmail = '';
+
+        // Auto-detect working API path on page load
+        async function detectAPIPath() {
+            for (const path of API_PATHS) {
+                try {
+                    const res = await fetch(path + '?action=check_session', { method: 'GET' });
+                    if (res.ok) {
+                        const text = await res.text();
+                        if (text.includes('{') && text.includes('success')) {
+                            API_URL = path;
+                            console.log('API found at:', API_URL);
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    // try next path
+                }
+            }
+            // If none found, default to most common and show warning
+            API_URL = '../backend/api.php';
+            console.warn('Could not auto-detect API. Using default:', API_URL);
+            console.warn('Make sure api.php, config.php, send_email.php are in your backend/ folder.');
+        }
+
+        detectAPIPath();
+
+        // ── HELPERS ───────────────────────────────────────────────────
+        function togglePass(id, btn) {
+            const inp = document.getElementById(id);
+            const isPass = inp.type === 'password';
+            inp.type = isPass ? 'text' : 'password';
+            btn.querySelector('i').className = isPass ? 'fas fa-eye-slash' : 'fas fa-eye';
+        }
+
+        function showAlert(id, msg, type) {
+            const el = document.getElementById(id);
+            el.textContent = msg;
+            el.className = 'alert ' + type;
+            el.style.display = 'block';
+        }
+
+        function goBack() {
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('step2').classList.remove('active');
+        }
+
+        // ── REGISTER FORM ─────────────────────────────────────────────
+        document.getElementById('regForm').addEventListener('submit', async e => {
+            e.preventDefault();
+
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm_password').value;
+
+            if (password !== confirm) {
+                showAlert('reg-alert', 'Passwords do not match', 'error');
+                return;
+            }
+            if (password.length < 8) {
+                showAlert('reg-alert', 'Password must be at least 8 characters', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('regBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending OTP...';
+
+            const formData = new FormData();
+            formData.append('action', 'register');
+            formData.append('full_name', document.getElementById('full_name').value.trim());
+            formData.append('email', document.getElementById('email').value.trim());
+            formData.append('mobile', document.getElementById('mobile').value.trim());
+            formData.append('dob', document.getElementById('dob').value);
+            formData.append('gender', document.getElementById('gender').value);
+            formData.append('password', password);
+
+            try {
+                const res = await fetch(API_URL, { method: 'POST', body: formData });
+
+                // Check if response is OK
+                if (!res.ok) {
+                    showAlert('reg-alert', 'Server error (' + res.status + '). Check that api.php exists in backend/ folder.', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> &nbsp;Send OTP & Register';
+                    return;
+                }
+
+                // Try to parse as JSON
+                const text = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (parseErr) {
+                    // PHP error — show raw output for debugging
+                    console.error('PHP returned non-JSON:', text);
+                    showAlert('reg-alert', 'PHP error detected. Check browser console for details. Make sure database is running and config.php is correct.', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> &nbsp;Send OTP & Register';
+                    return;
+                }
+
+                if (data.success) {
+                    userEmail = document.getElementById('email').value.trim();
+                    document.getElementById('otp-email-msg').textContent = 'OTP sent to ' + userEmail;
+                    document.getElementById('step1').classList.remove('active');
+                    document.getElementById('step2').classList.add('active');
+                    document.querySelector('.otp-digit').focus();
+
+                    // Show OTP on screen if email not configured (dev mode)
+                    if (data.otp) {
+                        const devBox = document.getElementById('dev-otp-box');
+                        const devOtp = document.getElementById('dev-otp-value');
+                        devBox.style.display = 'block';
+                        devOtp.textContent = data.otp;
+                        console.log('DEV OTP:', data.otp);
+                        document.getElementById('otp-email-msg').textContent = 'PHPMailer not configured — use OTP shown below:';
+                    }
+                } else {
+                    showAlert('reg-alert', data.message || 'Registration failed. Try again.', 'error');
+                }
+
+            } catch (err) {
+                console.error('Fetch error:', err);
+                showAlert('reg-alert',
+                    'Cannot reach server. Make sure: (1) XAMPP/WAMP is running, (2) api.php is in backend/ folder, (3) URL is http://localhost/... not file://',
+                    'error');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> &nbsp;Send OTP & Register';
+        });
+
+        // ── OTP INPUT AUTO-ADVANCE ─────────────────────────────────────
+        document.getElementById('otpInputs').addEventListener('input', e => {
+            if (e.target.classList.contains('otp-digit') && e.target.value) {
+                const inputs = [...document.querySelectorAll('.otp-digit')];
+                const idx = inputs.indexOf(e.target);
+                if (idx < inputs.length - 1) inputs[idx + 1].focus();
+            }
+        });
+        document.getElementById('otpInputs').addEventListener('keydown', e => {
+            if (e.key === 'Backspace' && !e.target.value) {
+                const inputs = [...document.querySelectorAll('.otp-digit')];
+                const idx = inputs.indexOf(e.target);
+                if (idx > 0) inputs[idx - 1].focus();
+            }
+        });
+
+        // ── VERIFY OTP ─────────────────────────────────────────────────
+        async function verifyOTP() {
+            const digits = [...document.querySelectorAll('.otp-digit')].map(i => i.value).join('');
+            if (digits.length < 6) {
+                showAlert('otp-alert', 'Please enter all 6 digits', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('verifyBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+
+            const formData = new FormData();
+            formData.append('action', 'verify_registration_otp');
+            formData.append('email', userEmail);
+            formData.append('otp', digits);
+            // Session fallback fields
+            formData.append('full_name', document.getElementById('full_name').value || '');
+            formData.append('mobile', document.getElementById('mobile').value || '');
+            formData.append('dob', document.getElementById('dob').value || '');
+            formData.append('gender', document.getElementById('gender').value || '');
+            formData.append('password', document.getElementById('password').value || '');
+
+            try {
+                const res = await fetch(API_URL, { method: 'POST', body: formData });
+                const text = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    console.error('PHP error:', text);
+                    showAlert('otp-alert', 'PHP error. Check console for details.', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> &nbsp;Verify & Create Account';
+                    return;
+                }
+
+                if (data.success) {
+                    showAlert('otp-alert', 'Registration successful! Redirecting...', 'success');
+                    setTimeout(() => window.location.href = 'account.html', 1500);
+                } else {
+                    showAlert('otp-alert', data.message || 'Invalid OTP. Try again.', 'error');
+                }
+            } catch (err) {
+                showAlert('otp-alert', 'Server error. Please try again.', 'error');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> &nbsp;Verify & Create Account';
+        }
+
+        // ── RESEND OTP ─────────────────────────────────────────────────
+        async function resendOTP() {
+            const formData = new FormData();
+            formData.append('action', 'register');
+            formData.append('full_name', document.getElementById('full_name').value);
+            formData.append('email', userEmail);
+            formData.append('mobile', document.getElementById('mobile').value);
+            formData.append('dob', document.getElementById('dob').value);
+            formData.append('gender', document.getElementById('gender').value);
+            formData.append('password', document.getElementById('password').value);
+
+            try {
+                const res = await fetch(API_URL, { method: 'POST', body: formData });
+                const data = await res.json();
+                if (data.otp) {
+                    document.getElementById('dev-otp-box').style.display = 'block';
+                    document.getElementById('dev-otp-value').textContent = data.otp;
+                }
+                showAlert('otp-alert', 'New OTP sent!', 'success');
+            } catch (e) {
+                showAlert('otp-alert', 'Could not resend. Try again.', 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>
