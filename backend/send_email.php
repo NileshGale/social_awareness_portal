@@ -10,7 +10,7 @@
  */
 
 function sendOTPEmail($to_email, $otp, $purpose) {
-    $subject = "Your OTP for $purpose - Social Awareness Portal";
+    $subject = "Your OTP for $purpose - AwareX";
 
     $message = "
     <html>
@@ -31,7 +31,7 @@ function sendOTPEmail($to_email, $otp, $purpose) {
     <body>
         <div class='container'>
             <div class='header'>
-                <h1>Social Awareness Portal</h1>
+                <h1>AwareX</h1>
                 <p>Creating Awareness for a Better Society</p>
             </div>
             <div class='content'>
@@ -45,7 +45,7 @@ function sendOTPEmail($to_email, $otp, $purpose) {
                 <p style='color:#4b5563;'>If you did not request this, please ignore this email or contact us immediately.</p>
             </div>
             <div class='footer'>
-                <p>&copy; 2026 Social Awareness Portal. All rights reserved.</p>
+                <p>&copy; 2026 AwareX. All rights reserved.</p>
                 <p>Nagpur, Maharashtra 440016, India</p>
             </div>
         </div>

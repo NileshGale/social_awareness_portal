@@ -707,13 +707,13 @@ function sendContactEmail($name, $email, $subject, $message) {
         .footer{text-align:center;padding:20px;background:#f9fafb;color:#9ca3af;font-size:12px;}
     </style></head><body>
     <div class='container'>
-        <div class='header'><h2>New Contact Message</h2><p>Social Awareness Portal</p></div>
+        <div class='header'><h2>New Contact Message</h2><p>AwareX</p></div>
         <div class='content'>
             <div class='field'><div class='label'>From</div><div class='value'>{$name} &lt;{$email}&gt;</div></div>
             <div class='field'><div class='label'>Subject</div><div class='value'>{$subject}</div></div>
             <div class='field'><div class='label'>Message</div><div class='value' style='white-space:pre-wrap;'>{$message}</div></div>
         </div>
-        <div class='footer'>Sent from Social Awareness Portal Contact Form</div>
+        <div class='footer'>Sent from AwareX Contact Form</div>
     </div></body></html>";
 
     // Check for PHPMailer

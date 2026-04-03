@@ -1,5 +1,5 @@
 -- ================================================================
---  SOCIAL AWARENESS PORTAL - COMPLETE DATABASE SCHEMA
+--  AWAREX - COMPLETE DATABASE SCHEMA
 --  Target: MySQL / MariaDB (XAMPP)
 -- ================================================================
 
@@ -130,7 +130,7 @@ CREATE TABLE feedback (
 CREATE TABLE feedback_replies (
     id              INT          NOT NULL AUTO_INCREMENT,
     feedback_id     INT          NOT NULL,
-    admin_name      VARCHAR(150) NOT NULL DEFAULT 'Social Awareness Team',
+    admin_name      VARCHAR(150) NOT NULL DEFAULT 'AwareX Team',
     reply           TEXT         NOT NULL,
     useful_count    INT          NOT NULL DEFAULT 0,
     not_useful_count INT         NOT NULL DEFAULT 0,
@@ -227,8 +227,8 @@ INSERT INTO feedback (id, user_id, name, email, category, message, status, likes
 --  SEED DATA: Admin Replies
 -- ================================================================
 INSERT INTO feedback_replies (id, feedback_id, admin_name, reply, useful_count) VALUES
-(1, 1, 'Social Awareness Team', 'Thank you Priya! We are glad it helped.', 5),
-(2, 2, 'Social Awareness Team', 'We are glad your father was protected Rahul!', 8);
+(1, 1, 'AwareX Team', 'Thank you Priya! We are glad it helped.', 5),
+(2, 2, 'AwareX Team', 'We are glad your father was protected Rahul!', 8);
 
 -- Reset Auto-Increments
 ALTER TABLE users AUTO_INCREMENT = 100;

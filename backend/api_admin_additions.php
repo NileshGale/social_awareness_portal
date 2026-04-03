@@ -131,7 +131,7 @@ function handleAdminReplyFeedback() {
         $stmt->close();
     } else {
         // Insert new reply
-        $stmt = $conn->prepare("INSERT INTO feedback_replies (feedback_id, admin_name, reply) VALUES (?, 'Social Awareness Team', ?)");
+        $stmt = $conn->prepare("INSERT INTO feedback_replies (feedback_id, admin_name, reply) VALUES (?, 'AwareX Team', ?)");
         $stmt->bind_param("is", $feedback_id, $reply);
         $stmt->execute();
         $stmt->close();
@@ -544,7 +544,7 @@ function handleBookSchedule() {
         <html>
         <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
             <h2 style='color: #1e3a8a;'>New Schedule Booking Request on Zoom or Google Meet</h2>
-            <p>You have received a new schedule booking request from the Social Awareness Portal. Here are the details:</p>
+            <p>You have received a new schedule booking request from AwareX. Here are the details:</p>
             <table style='width: 100%; border-collapse: collapse; margin-top: 20px;'>
                 <tr>
                     <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold; width: 30%;'>Full Name</td>
@@ -567,7 +567,7 @@ function handleBookSchedule() {
                     <td style='padding: 10px; border: 1px solid #ddd;'>" . nl2br(htmlspecialchars($problem_desc)) . "</td>
                 </tr>
             </table>
-            <p style='margin-top: 30px; font-size: 0.9em; color: #777;'>Automated message from Social Awareness Portal.</p>
+            <p style='margin-top: 30px; font-size: 0.9em; color: #777;'>Automated message from AwareX.</p>
         </body>
         </html>
         ";

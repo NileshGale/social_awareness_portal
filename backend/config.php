@@ -7,7 +7,7 @@ define('DB_NAME', 'social_awareness_portal');
 
 // Email configuration
 define('SMTP_FROM_EMAIL', 'dhanashreegame@gmail.com');
-define('SMTP_FROM_NAME', 'Social Awareness Portal');
+define('SMTP_FROM_NAME', 'AwareX');
 
 // PHPMailer SMTP settings (Gmail App Password)
 define('SMTP_HOST', 'smtp.gmail.com');
