@@ -1083,7 +1083,40 @@
                 document.getElementById('heroRegisterBtn').style.display = 'inline-block';
                 document.getElementById('ctaRegisterBtn').style.display = 'inline-block';
             });
+        // ── 20-Minute Idle Auto-Logout ─────────────────────────────────
+        (function() {
+            let timeout;
+            const idleTime = 20 * 60 * 1000; // 20 minutes
+
+            function resetTimer() {
+                clearTimeout(timeout);
+                timeout = setTimeout(logoutUser, idleTime);
+            }
+
+            async function logoutUser() {
+                // Only logout if user was actually logged in
+                fetch('../backend/api.php?action=check_session')
+                    .then(r => r.json())
+                    .then(async data => {
+                        if (data.logged_in) {
+                            const res = await fetch('../backend/api.php?action=logout');
+                            const logoutData = await res.json();
+                            if (logoutData.success) {
+                                sessionStorage.clear();
+                                window.location.href = 'login.html?reason=idle';
+                            }
+                        }
+                    }).catch(() => {});
+            }
+
+            window.onload = resetTimer;
+            window.onmousemove = resetTimer;
+            window.onmousedown = resetTimer;
+            window.ontouchstart = resetTimer;
+            window.onclick = resetTimer;
+            window.onkeydown = resetTimer;
+            window.addEventListener('scroll', resetTimer, true);
+        })();
     </script>
 </body>
-
 </html>

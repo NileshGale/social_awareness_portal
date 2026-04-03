@@ -596,6 +596,16 @@
         </a>
     </nav>
 
+    <script>
+        // Check for idle logout reason
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('reason') === 'idle') {
+                showAlert('login-alert', 'You have been logged out due to 20 minutes of inactivity.', 'warning');
+            }
+        });
+    </script>
+
     <!-- ── Main card ── -->
     <div class="page-wrap">
         <div class="login-card">
