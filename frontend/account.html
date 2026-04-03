@@ -755,6 +755,10 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+        /* ── Admin Mode Hiding ── */
+        body.is-admin .nav-menu li:has(a[href="get_help.html"]) {
+            display: none !important;
+        }
     </style>
 </head>
 
@@ -966,6 +970,7 @@
                 currentUser = data.user;
                 // If admin lands on account.html, send them to admin panel
                 if (data.user.is_admin == 1) {
+                    document.body.classList.add('is-admin');
                     window.location.href = 'admin.html';
                     return;
                 }

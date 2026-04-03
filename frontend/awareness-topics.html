@@ -499,6 +499,10 @@
                 font-size: 2rem;
             }
         }
+        /* ── Admin Mode Hiding ── */
+        body.is-admin .nav-menu li:has(a[href="get_help.html"]) {
+            display: none !important;
+        }
     </style>
 </head>
 
@@ -1205,6 +1209,7 @@
     </script>
     <script>
         function applyAdminBranding() {
+            document.body.classList.add('is-admin');
             const logoH2 = document.querySelector('.logo h2');
             const logoP = document.querySelector('.logo p');
             const acctBtn = document.getElementById('navAccountBtn');
