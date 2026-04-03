@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact - AwareX</title>
+    <title>Get Help - AwareX</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
@@ -458,14 +458,14 @@
                 <li><a href="awareness-topics.html">Awareness Topics</a></li>
                 <li><a href="campaigns.html">Campaigns</a></li>
                 <li><a href="feedback.html">Feedback</a></li>
-                <li><a href="contact.html" class="active">Contact</a></li>
+                <li><a href="get_help.html" class="active">Get Help</a></li>
                 <li><a href="account.html" class="nav-btn" id="navAccountBtn">Your Account</a></li>
             </ul>
         </div>
     </nav>
 
     <div class="page-hero">
-        <h1>Contact Us</h1>
+        <h1>Get Help</h1>
         <p>We're here to help. Reach out to us anytime.</p>
     </div>
 
@@ -607,7 +607,7 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
             const fd = new FormData();
-            fd.append('action', 'submit_contact');
+            fd.append('action', 'submit_get_help');
             fd.append('name', document.getElementById('c-name').value);
             fd.append('email', document.getElementById('c-email').value);
             fd.append('subject', document.getElementById('c-subject').value);

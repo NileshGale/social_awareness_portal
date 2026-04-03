@@ -31,7 +31,7 @@ switch ($action) {
     case 'add_comment':               handleAddComment(); break;
     case 'get_comments':              handleGetComments(); break;
     case 'share_campaign':            handleShareCampaign(); break;
-    case 'submit_contact':            handleSubmitContact(); break;
+    case 'submit_get_help':           handleSubmitGetHelp(); break;
     case 'submit_feedback':           handleSubmitFeedback(); break;
     case 'get_feedbacks':             handleGetFeedbacks(); break;
     case 'get_my_feedbacks':          handleGetMyFeedbacks(); break;
@@ -664,7 +664,7 @@ function handleShareCampaign() {
 }
 
 // ── Contact ───────────────────────────────────────────────────
-function handleSubmitContact() {
+function handleSubmitGetHelp() {
     global $conn;
     $name    = sanitizeInput($_POST['name'] ?? '');
     $email   = sanitizeInput($_POST['email'] ?? '');
@@ -683,7 +683,7 @@ function handleSubmitContact() {
     $stmt->close();
 
     // Send email notification to admin
-    sendContactEmail($name, $email, $subject, $message);
+    sendGetHelpEmail($name, $email, $subject, $message);
 
     if ($saved) {
         echo json_encode(['success' => true, 'message' => 'Your message has been sent successfully! We will respond within 24 hours.']);
@@ -692,7 +692,7 @@ function handleSubmitContact() {
     }
 }
 
-function sendContactEmail($name, $email, $subject, $message) {
+function sendGetHelpEmail($name, $email, $subject, $message) {
     $adminEmail = SMTP_USERNAME; // Send to dhanashreegame@gmail.com
 
     $emailBody = "
@@ -707,13 +707,13 @@ function sendContactEmail($name, $email, $subject, $message) {
         .footer{text-align:center;padding:20px;background:#f9fafb;color:#9ca3af;font-size:12px;}
     </style></head><body>
     <div class='container'>
-        <div class='header'><h2>New Contact Message</h2><p>AwareX</p></div>
+        <div class='header'><h2>New Get Help Message</h2><p>AwareX</p></div>
         <div class='content'>
             <div class='field'><div class='label'>From</div><div class='value'>{$name} &lt;{$email}&gt;</div></div>
             <div class='field'><div class='label'>Subject</div><div class='value'>{$subject}</div></div>
             <div class='field'><div class='label'>Message</div><div class='value' style='white-space:pre-wrap;'>{$message}</div></div>
         </div>
-        <div class='footer'>Sent from AwareX Contact Form</div>
+        <div class='footer'>Sent from AwareX Get Help Form</div>
     </div></body></html>";
 
     // Check for PHPMailer
@@ -758,7 +758,7 @@ function sendContactEmail($name, $email, $subject, $message) {
             $mail->addAddress($adminEmail);
             $mail->addReplyTo($email, $name);
             $mail->isHTML(true);
-            $mail->Subject = "Contact Form: {$subject} — from {$name}";
+            $mail->Subject = "Get Help: {$subject} — from {$name}";
             $mail->Body    = $emailBody;
             $mail->send();
         } catch (\Exception $e) {
