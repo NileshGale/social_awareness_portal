@@ -18,6 +18,7 @@
             --light: #f8faff;
             --admin: var(--blue);
             --admin-light: #eff6ff;
+            scrollbar-gutter: stable;
         }
 
         * {
@@ -59,6 +60,7 @@
             font-weight: 900;
             display: flex;
             align-items: center;
+            gap: 0.6rem;
         }
 
         .logo p {
@@ -108,7 +110,6 @@
             text-transform: uppercase;
             letter-spacing: 0.04em;
             vertical-align: middle;
-            margin-left: 0.5rem;
         }
 
         .nav-btn-admin {
@@ -1197,7 +1198,7 @@
         <div class="nav-container">
             <div class="logo">
                 <h2><img src="../assets/logo.jpg" alt="Logo"
-                        style="height: 35px; width: auto; vertical-align: middle; margin-right: 8px;"> AwareX</h2>
+                        style="height: 35px; width: auto; vertical-align: middle;"> AwareX</h2>
                 <p>Creating Awareness for a Better Society</p>
             </div>
             <ul class="nav-menu">
@@ -1851,7 +1852,7 @@
             const acctBtn = document.getElementById('navAccountBtn');
             
             if (logoH2) {
-                logoH2.innerHTML = `<img src="../assets/logo.jpg" alt="Logo" style="height:35px;width:auto;vertical-align:middle;margin-right:8px;"> AwareX <span class="admin-badge"><i class="fas fa-shield-alt"></i> admin</span>`;
+                logoH2.innerHTML = `<img src="../assets/logo.jpg" alt="Logo" style="height:35px;width:auto;vertical-align:middle;"> AwareX <span class="admin-badge"><i class="fas fa-shield-alt"></i> admin</span>`;
             }
             if (logoP) {
                 logoP.textContent = 'Administration Panel';

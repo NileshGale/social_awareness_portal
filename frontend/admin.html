@@ -18,6 +18,7 @@
             --light: #f8faff;
             --admin: var(--blue);
             --admin-light: #eff6ff;
+            scrollbar-gutter: stable;
         }
 
         * {
@@ -80,7 +81,6 @@
             text-transform: uppercase;
             letter-spacing: 0.04em;
             vertical-align: middle;
-            margin-left: 0.5rem;
         }
 
         .nav-menu {
@@ -1459,7 +1459,7 @@
         <div class="nav-container">
             <div class="logo">
                 <h2>
-                    <img src="../assets/logo.jpg" alt="Logo" style="height:35px;width:auto;vertical-align:middle;margin-right:8px;">
+                    <img src="../assets/logo.jpg" alt="Logo" style="height:35px;width:auto;vertical-align:middle;">
                     AwareX
                     <span class="admin-badge"><i class="fas fa-shield-alt"></i> admin</span>
                 </h2>
@@ -1786,6 +1786,7 @@
                 const d = await r.json();
                 if (d.logged_in && d.user && d.user.is_admin == 1) {
                     adminUser = d.user;
+                    sessionStorage.setItem('is_admin', '1');
                     populateAdminProfile(d.user);
                     return true;
                 }
@@ -2283,9 +2284,15 @@
            INIT
         ══════════════════════════════════════════ */
         async function init() {
+            // Instant check to avoid flicker
+            if (sessionStorage.getItem('is_admin') === '1') {
+                // We trust it for initial render, then verify
+            }
+
             const isAdmin = await checkAdminAuth();
 
             if (!isAdmin) {
+                sessionStorage.removeItem('is_admin');
                 document.getElementById('view-feedback').classList.remove('active');
                 document.getElementById('view-account').classList.remove('active');
                 document.getElementById('access-denied').classList.add('show');

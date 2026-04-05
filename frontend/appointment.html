@@ -19,6 +19,7 @@
             --admin-blue: #1e40af;
             --success: #059669;
             --pending: #d97706;
+            scrollbar-gutter: stable;
         }
 
         * {
@@ -61,7 +62,7 @@
             font-weight: 900;
             display: flex;
             align-items: center;
-            /* gap: 0.6rem; */
+            gap: 0.6rem;
         }
 
         .logo p {
@@ -144,7 +145,6 @@
             text-transform: uppercase;
             letter-spacing: 0.04em;
             vertical-align: middle;
-            margin-left: 0.5rem;
         }
 
         .page-header {
@@ -347,6 +347,7 @@
             line-height: 1.5;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -522,7 +523,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <h2><img src="../assets/logo.jpg" alt="Logo" style="height: 35px; width: auto; vertical-align: middle; margin-right: 8px;"> AwareX</h2>
+                <h2><img src="../assets/logo.jpg" alt="Logo" style="height: 35px; width: auto; vertical-align: middle;"> AwareX</h2>
                 <p>Creating Awareness for a Better Society</p>
             </div>
             <ul class="nav-menu">
@@ -907,7 +908,7 @@
             const acctBtn = document.getElementById('navAccountBtn');
             
             if (logoH2) {
-                logoH2.innerHTML = `<img src="../assets/logo.jpg" alt="Logo" style="height:35px;width:auto;vertical-align:middle;margin-right:8px;"> AwareX <span class="admin-badge"><i class="fas fa-shield-alt"></i> admin</span>`;
+                logoH2.innerHTML = `<img src="../assets/logo.jpg" alt="Logo" style="height:35px;width:auto;vertical-align:middle;"> AwareX <span class="admin-badge"><i class="fas fa-shield-alt"></i> admin</span>`;
             }
             if (logoP) {
                 logoP.textContent = 'Administration Panel';
@@ -932,12 +933,16 @@
         }
 
         // Init
+        // Instant check from cache to prevent flicker
+        if (sessionStorage.getItem('is_admin') === '1') applyAdminBranding();
+
         fetch('../backend/api.php?action=check_session')
             .then(r => r.json())
             .then(data => {
                 if (!data.logged_in || data.user.is_admin != 1) {
                     window.location.href = 'login.html';
                 } else {
+                    sessionStorage.setItem('is_admin', '1');
                     applyAdminBranding();
                     fetchAppointments();
                 }

@@ -16,6 +16,7 @@
             --accent: #e84545;
             --gold: #f0a500;
             --light: #f8faff;
+            scrollbar-gutter: stable;
         }
 
         * {
@@ -59,6 +60,7 @@
             font-weight: 900;
             display: flex;
             align-items: center;
+            gap: 0.6rem;
         }
 
         .logo p {
@@ -188,7 +190,6 @@
             text-transform: uppercase;
             letter-spacing: 0.04em;
             vertical-align: middle;
-            margin-left: 0.5rem;
         }
 
         .profile-header {
@@ -816,7 +817,7 @@
         <div class="nav-container">
             <div class="logo">
                 <h2><img src="../assets/logo.jpg" alt="Logo"
-                        style="height: 35px; width: auto; vertical-align: middle; margin-right: 8px;"> AwareX</h2>
+                        style="height: 35px; width: auto; vertical-align: middle;"> AwareX</h2>
                 <p>Creating Awareness for a Better Society</p>
             </div>
             <ul class="nav-menu">
@@ -1297,6 +1298,37 @@
             el.style.display = 'block';
             setTimeout(() => { el.style.display = 'none'; }, 5000);
         }
+
+        function applyAdminBranding() {
+            document.body.classList.add('is-admin');
+            const logoH2 = document.querySelector('.logo h2');
+            const logoP = document.querySelector('.logo p');
+            const acctBtn = document.getElementById('navAccountBtn');
+            
+            if (logoH2) {
+                logoH2.innerHTML = `<img src="../assets/logo.jpg" alt="Logo" style="height:35px;width:auto;vertical-align:middle;"> AwareX <span class="admin-badge"><i class="fas fa-shield-alt"></i> admin</span>`;
+            }
+            if (logoP) {
+                logoP.textContent = 'Administration Panel';
+                logoP.style.cssText = 'color: #6b7280; font-size: 0.78rem; margin-top: 2px;';
+            }
+            
+            if (acctBtn) {
+                acctBtn.href = 'admin.html#account';
+                acctBtn.classList.add('nav-btn-admin');
+                acctBtn.innerHTML = '<i class="fas fa-user-shield"></i> Your Account';
+            }
+            
+            const appointLi = document.getElementById('navAppointmentLi');
+            const getHelpLi = document.getElementById('navGetHelpLi');
+            if (appointLi) appointLi.style.cssText = 'display: block !important;'; 
+            if (getHelpLi) getHelpLi.style.cssText = 'display: none !important;';
+            const feedbackLink = document.querySelector('a[href="feedback.html"]');
+            if (feedbackLink) feedbackLink.href = 'admin.html';
+        }
+
+        // Instant check from cache to prevent flicker
+        if (sessionStorage.getItem('is_admin') === '1') applyAdminBranding();
 
         init();
         // ── 20-Minute Idle Auto-Logout ─────────────────────────────────
