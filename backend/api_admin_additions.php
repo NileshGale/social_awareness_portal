@@ -753,6 +753,47 @@ function handleMarkNotificationsRead() {
     echo json_encode(['success' => true, 'message' => 'Notifications cleared']);
 }
 
+// ── Delete a single notification ──
+function handleDeleteNotification() {
+    global $conn;
+    if (!isLoggedIn()) {
+        echo json_encode(['success' => false, 'message' => 'Login required']);
+        return;
+    }
+    $user_id = getCurrentUserId();
+    $id = (int)($_POST['notification_id'] ?? 0);
+    if (!$id) {
+        echo json_encode(['success' => false, 'message' => 'Notification ID required']);
+        return;
+    }
+    $stmt = $conn->prepare("DELETE FROM notifications WHERE id=? AND user_id=?");
+    $stmt->bind_param("ii", $id, $user_id);
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Notification deleted']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to delete notification']);
+    }
+    $stmt->close();
+}
+
+// ── Delete all notifications for user ──
+function handleDeleteAllNotifications() {
+    global $conn;
+    if (!isLoggedIn()) {
+        echo json_encode(['success' => false, 'message' => 'Login required']);
+        return;
+    }
+    $user_id = getCurrentUserId();
+    $stmt = $conn->prepare("DELETE FROM notifications WHERE user_id=?");
+    $stmt->bind_param("i", $user_id);
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'All notifications deleted']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to clear notifications']);
+    }
+    $stmt->close();
+}
+
 
 // ── Delete appointment ──
 function handleAdminDeleteAppointment() {

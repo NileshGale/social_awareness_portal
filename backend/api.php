@@ -53,6 +53,8 @@ switch ($action) {
     case 'admin_confirm_appointment':    handleAdminConfirmAppointment(); break;
     case 'get_notifications':            handleGetNotifications(); break;
     case 'mark_notifications_read':      handleMarkNotificationsRead(); break;
+    case 'delete_notification':          handleDeleteNotification(); break;
+    case 'delete_all_notifications':     handleDeleteAllNotifications(); break;
 
     default:
         echo json_encode(['success' => false, 'message' => 'Invalid action']);
