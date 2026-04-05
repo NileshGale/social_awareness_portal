@@ -112,6 +112,36 @@
             opacity: 0.9;
         }
 
+        .nav-noti {
+            margin-left: 0.5rem;
+        }
+
+        .nav-noti a {
+            font-size: 1.2rem;
+            color: #374151;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .nav-noti a:hover {
+            color: var(--accent) !important;
+            transform: scale(1.1);
+        }
+
+        .nav-noti-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid white;
+            display: none;
+        }
+
         /* ── Page Hero ── */
         .page-hero {
             background: linear-gradient(135deg, var(--navy), #1e40af);
@@ -1433,6 +1463,12 @@
                 <li><a href="#feedback" id="nav-feedback" onclick="showView('feedback')" class="active">Feedback</a></li>
                 <li><a href="#account" id="nav-account" onclick="showView('account')" class="nav-btn-admin"><i
                             class="fas fa-user-shield"></i> Your Account</a></li>
+                <li class="nav-noti">
+                    <a href="#" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="nav-noti-dot"></span>
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>

@@ -92,6 +92,36 @@
             border-radius: 50px;
         }
 
+        .nav-noti {
+            margin-left: 0.5rem;
+        }
+
+        .nav-noti a {
+            font-size: 1.2rem;
+            color: #374151;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .nav-noti a:hover {
+            color: var(--accent) !important;
+            transform: scale(1.1);
+        }
+
+        .nav-noti-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid white;
+            display: none;
+        }
+
         .page-content {
             max-width: 1000px;
             width: 100%;
@@ -780,6 +810,12 @@
                 <li id="navAppointmentLi" style="display:none;"><a href="appointment.html">Appointment</a></li>
                 <li><a href="get_help.html">Get Help</a></li>
                 <li><a href="account.html" class="nav-btn" id="navAccountBtn">Your Account</a></li>
+                <li class="nav-noti">
+                    <a href="#" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="nav-noti-dot"></span>
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -987,10 +1023,11 @@
                 document.getElementById('profileName').textContent = data.user.full_name || 'User';
                 document.getElementById('profileEmail').textContent = data.user.email;
                 // Fill avatar
+                const initials = (data.user.full_name || 'U').charAt(0).toUpperCase();
                 if (data.user.profile_image && data.user.profile_image !== 'default-profile.png') {
-                    document.getElementById('avatarDisplay').innerHTML = `<img src="../uploads/profiles/${data.user.profile_image}" alt="">`;
+                    document.getElementById('avatarDisplay').innerHTML = `<img src="../uploads/profiles/${data.user.profile_image}" alt="" onerror="this.parentElement.textContent='${initials}'">`;
                 } else {
-                    document.getElementById('avatarDisplay').textContent = (data.user.full_name || 'U').charAt(0).toUpperCase();
+                    document.getElementById('avatarDisplay').textContent = initials;
                 }
                 // Fill form
                 document.getElementById('p-fullname').value = data.user.full_name || '';
@@ -1043,7 +1080,8 @@
                 const res = await fetch('../backend/api.php', { method: 'POST', body: fd });
                 const data = await res.json();
                 if (data.success) {
-                    document.getElementById('avatarDisplay').innerHTML = `<img src="../uploads/profiles/${data.filename}" alt="">`;
+                    const initials = (currentUser.full_name || 'U').charAt(0).toUpperCase();
+                    document.getElementById('avatarDisplay').innerHTML = `<img src="../uploads/profiles/${data.filename}" alt="" onerror="this.parentElement.textContent='${initials}'">`;
                 }
             } catch (e) { }
         }

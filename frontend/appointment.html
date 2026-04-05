@@ -97,7 +97,39 @@
             font-weight: 600 !important;
         }
 
-        /* ── Header Section ── */
+        .nav-btn-admin:hover {
+            opacity: 0.9;
+        }
+
+        .nav-noti {
+            margin-left: 0.5rem;
+        }
+
+        .nav-noti a {
+            font-size: 1.2rem;
+            color: #374151;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .nav-noti a:hover {
+            color: var(--accent) !important;
+            transform: scale(1.1);
+        }
+
+        .nav-noti-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid white;
+            display: none;
+        }
         .page-header {
             background: linear-gradient(135deg, var(--navy), var(--admin-blue));
             padding: 3rem 2rem;
@@ -482,6 +514,12 @@
                 <li><a href="admin.html">Admin Dashboard</a></li>
                 <li><a href="appointment.html" class="active">Appointments</a></li>
                 <li><a href="account.html" class="nav-btn-admin">Your Account</a></li>
+                <li class="nav-noti">
+                    <a href="#" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="nav-noti-dot"></span>
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -559,10 +597,6 @@
             <div class="form-group">
                 <label>Time</label>
                 <input type="time" id="edit-time">
-            </div>
-            <div class="form-group">
-                <label>Zoom/Meet Link</label>
-                <input type="url" id="edit-link" placeholder="https://zoom.us/j/...">
             </div>
             <div class="modal-btns">
                 <button class="modal-btn btn-cancel" onclick="closeModal('editModal')">Cancel</button>
@@ -643,11 +677,12 @@
                     ? `../uploads/profiles/${app.profile_image}` 
                     : null;
 
+                const initials = app.name ? app.name.charAt(0).toUpperCase() : 'U';
                 return `
                     <div class="appointment-card" data-id="${app.id}">
                         <div class="user-col">
                             <div class="user-avatar">
-                                ${avatar ? `<img src="${avatar}" alt="User">` : `<i class="fas fa-user"></i>`}
+                                ${avatar ? `<img src="${avatar}" alt="" onerror="this.src=''; this.parentElement.textContent='${initials}'">` : initials}
                             </div>
                             <div class="user-info">
                                 <h4>${app.name}</h4>
@@ -729,7 +764,6 @@
             document.getElementById('edit-id').value = id;
             document.getElementById('edit-date').value = app.preferred_date;
             document.getElementById('edit-time').value = app.preferred_time;
-            document.getElementById('edit-link').value = app.meet_link || '';
             document.getElementById('editModal').classList.add('active');
         }
 
@@ -758,7 +792,6 @@
             fd.append('appointment_id', id);
             fd.append('preferred_date', date);
             fd.append('preferred_time', time);
-            fd.append('meet_link', link);
 
             try {
                 const r = await fetch(API, { method: 'POST', body: fd });

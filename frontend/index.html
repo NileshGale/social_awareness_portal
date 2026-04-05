@@ -99,6 +99,37 @@
         .nav-btn:hover {
             background: var(--navy) !important;
             transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(232, 69, 69, 0.3);
+        }
+
+        .nav-noti {
+            margin-left: 0.5rem;
+        }
+
+        .nav-noti a {
+            font-size: 1.2rem;
+            color: var(--text);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .nav-noti a:hover {
+            color: var(--accent) !important;
+            transform: scale(1.1);
+        }
+
+        .nav-noti-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid white;
+            display: none;
         }
 
         /* Admin Branding */
@@ -781,6 +812,12 @@
                 <li id="navAppointmentLi" style="display:none;"><a href="appointment.html">Appointment</a></li>
                 <li><a href="get_help.html">Get Help</a></li>
                 <li><a href="account.html" class="nav-btn" id="navAccountBtn">Your Account</a></li>
+                <li class="nav-noti">
+                    <a href="#" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="nav-noti-dot"></span>
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>

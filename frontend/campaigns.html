@@ -126,6 +126,36 @@
             transform: translateY(-2px);
         }
 
+        .nav-noti {
+            margin-left: 0.5rem;
+        }
+
+        .nav-noti a {
+            font-size: 1.2rem;
+            color: #374151;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .nav-noti a:hover {
+            color: var(--accent) !important;
+            transform: scale(1.1);
+        }
+
+        .nav-noti-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid white;
+            display: none;
+        }
+
         .page-header {
             background: linear-gradient(135deg, var(--navy), #1e40af);
             padding: 3.5rem 2rem;
@@ -556,6 +586,12 @@
                 <li id="navAppointmentLi" style="display:none;"><a href="appointment.html">Appointment</a></li>
                 <li><a href="get_help.html">Get Help</a></li>
                 <li><a href="account.html" class="nav-btn" id="navAccountBtn">Your Account</a></li>
+                <li class="nav-noti">
+                    <a href="#" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="nav-noti-dot"></span>
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -1115,7 +1151,7 @@
         function buildCampaignCard(c) {
             const initials = c.full_name ? c.full_name.charAt(0).toUpperCase() : 'U';
             const avatar = c.profile_image && c.profile_image !== 'default-profile.png'
-                ? `<img src="../uploads/profiles/${c.profile_image}" alt="">`
+                ? `<img src="../uploads/profiles/${c.profile_image}" alt="" onerror="this.src=''; this.parentElement.textContent='${initials}'">`
                 : initials;
             const timeAgo = formatTimeAgo(c.created_at);
             let mediaHTML = '';
