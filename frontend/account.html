@@ -777,8 +777,9 @@
                 <li><a href="awareness-topics.html">Awareness Topics</a></li>
                 <li><a href="campaigns.html">Campaigns</a></li>
                 <li><a href="feedback.html">Feedback</a></li>
+                <li id="navAppointmentLi" style="display:none;"><a href="appointment.html">Appointment</a></li>
                 <li><a href="get_help.html">Get Help</a></li>
-                <li><a href="account.html" class="nav-btn active">Your Account</a></li>
+                <li><a href="account.html" class="nav-btn" id="navAccountBtn">Your Account</a></li>
             </ul>
         </div>
     </nav>
@@ -971,6 +972,14 @@
                 // If admin lands on account.html, send them to admin panel
                 if (data.user.is_admin == 1) {
                     document.body.classList.add('is-admin');
+                    const acctBtn = document.getElementById('navAccountBtn');
+                    if (acctBtn) {
+                        acctBtn.href = 'admin.html#account';
+                        acctBtn.classList.add('nav-btn-admin');
+                        acctBtn.innerHTML = '<i class="fas fa-user-shield"></i> Your Account';
+                    }
+                    const appointLi = document.getElementById('navAppointmentLi');
+                    if (appointLi) appointLi.style.display = 'block';
                     window.location.href = 'admin.html';
                     return;
                 }

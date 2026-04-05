@@ -1175,6 +1175,7 @@
                 <li><a href="awareness-topics.html">Awareness Topics</a></li>
                 <li><a href="campaigns.html">Campaigns</a></li>
                 <li><a href="feedback.html" class="active">Feedback</a></li>
+                <li id="navAppointmentLi" style="display:none;"><a href="appointment.html">Appointment</a></li>
                 <li><a href="get_help.html">Get Help</a></li>
                 <li><a href="account.html" class="nav-btn" id="navAccountBtn">Your Account</a></li>
             </ul>
@@ -1820,6 +1821,8 @@
                 acctBtn.classList.add('nav-btn-admin');
                 acctBtn.innerHTML = '<i class="fas fa-user-shield"></i> Your Account';
             }
+            const appointLi = document.getElementById('navAppointmentLi');
+            if (appointLi) appointLi.style.display = 'block';
             const feedbackLink = document.querySelector('a[href="feedback.html"]');
             if (feedbackLink) {
                 feedbackLink.href = 'admin.html';

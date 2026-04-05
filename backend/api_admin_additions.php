@@ -603,6 +603,152 @@ function handleBookSchedule() {
 }
 
 
+// ── Get ALL appointments for admin ──
+function handleAdminGetAppointments() {
+    global $conn;
+    if (!isAdmin()) {
+        echo json_encode(['success' => false, 'message' => 'Admin access required']);
+        return;
+    }
+
+    $query = "SELECT s.*, u.profile_image 
+              FROM schedule_bookings s
+              LEFT JOIN users u ON s.user_id = u.id
+              ORDER BY s.preferred_date ASC, s.preferred_time ASC";
+
+    $result = $conn->query($query);
+    $appointments = $result->fetch_all(MYSQLI_ASSOC);
+
+    echo json_encode(['success' => true, 'appointments' => $appointments]);
+}
+
+// ── Update appointment date/time/link ──
+function handleAdminUpdateAppointment() {
+    global $conn;
+    if (!isAdmin()) {
+        echo json_encode(['success' => false, 'message' => 'Admin access required']);
+        return;
+    }
+
+    $id             = (int)($_POST['appointment_id'] ?? 0);
+    $preferred_date = sanitizeInput($_POST['preferred_date'] ?? '');
+    $preferred_time = sanitizeInput($_POST['preferred_time'] ?? '');
+    $meet_link      = sanitizeInput($_POST['meet_link'] ?? '');
+
+    if (!$id || !$preferred_date || !$preferred_time) {
+        echo json_encode(['success' => false, 'message' => 'ID, date, and time are required']);
+        return;
+    }
+
+    $stmt = $conn->prepare("UPDATE schedule_bookings SET preferred_date=?, preferred_time=?, meet_link=? WHERE id=?");
+    $stmt->bind_param("sssi", $preferred_date, $preferred_time, $meet_link, $id);
+    
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Appointment updated successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to update appointment']);
+    }
+    $stmt->close();
+}
+
+// ── Delete appointment ──
+function handleAdminDeleteAppointment() {
+    global $conn;
+    if (!isAdmin()) {
+        echo json_encode(['success' => false, 'message' => 'Admin access required']);
+        return;
+    }
+
+    $id = (int)($_POST['appointment_id'] ?? 0);
+    if (!$id) {
+        echo json_encode(['success' => false, 'message' => 'ID required']);
+        return;
+    }
+
+    $stmt = $conn->prepare("DELETE FROM schedule_bookings WHERE id=?");
+    $stmt->bind_param("i", $id);
+    
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Appointment deleted successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to delete appointment']);
+    }
+    $stmt->close();
+}
+
+// ── Confirm appointment and send meeting link via email ──
+function handleAdminConfirmAppointment() {
+    global $conn;
+    if (!isAdmin()) {
+        echo json_encode(['success' => false, 'message' => 'Admin access required']);
+        return;
+    }
+
+    $id        = (int)($_POST['appointment_id'] ?? 0);
+    $meet_link = sanitizeInput($_POST['meet_link'] ?? '');
+
+    if (!$id || !$meet_link) {
+        echo json_encode(['success' => false, 'message' => 'Appointment ID and meeting link are required']);
+        return;
+    }
+
+    // Fetch appointment details
+    $stmt = $conn->prepare("SELECT * FROM schedule_bookings WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $booking = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$booking) {
+        echo json_encode(['success' => false, 'message' => 'Appointment not found']);
+        return;
+    }
+
+    // Update status and link in DB
+    $stmt = $conn->prepare("UPDATE schedule_bookings SET status='confirmed', meet_link=? WHERE id=?");
+    $stmt->bind_param("si", $meet_link, $id);
+    
+    if ($stmt->execute()) {
+        // Send confirmation email to user
+        $subject = "Consultation Confirmed - AwareX";
+        $email_body = "
+        <html>
+        <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
+            <div style='max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden;'>
+                <div style='background: #1e3a8a; color: white; padding: 30px; text-align: center;'>
+                    <h2 style='margin: 0;'>Appointment Confirmed</h2>
+                </div>
+                <div style='padding: 30px;'>
+                    <p>Hello <strong>" . htmlspecialchars($booking['name']) . "</strong>,</p>
+                    <p>Your consultation request has been confirmed. Please find the meeting details below:</p>
+                    
+                    <div style='background: #f8faff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px; margin: 20px 0;'>
+                        <p style='margin: 0 0 10px 0;'><strong>Date:</strong> " . date('d-M-Y', strtotime($booking['preferred_date'])) . "</p>
+                        <p style='margin: 0 0 10px 0;'><strong>Time:</strong> " . date('h:i A', strtotime($booking['preferred_time'])) . "</p>
+                        <p style='margin: 0;'><strong>Meeting Link:</strong> <a href='" . $meet_link . "' style='color: #1e3a8a; text-decoration: underline; font-weight: bold;'>Join Meeting</a></p>
+                    </div>
+                                        
+                    <p>Please ensure you are ready 5 minutes before the scheduled time.</p>
+                    <p>If you have any questions, feel free to reply to this email.</p>
+                </div>
+                <div style='background: #f9fafb; padding: 20px; text-align: center; font-size: 0.85em; color: #777;'>
+                    &copy; 2026 AwareX Team. All rights reserved.
+                </div>
+            </div>
+        </body>
+        </html>
+        ";
+        
+        sendNotificationEmail($booking['email'], $subject, $email_body);
+
+        echo json_encode(['success' => true, 'message' => 'Appointment confirmed and email sent!']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to confirm appointment']);
+    }
+    $stmt->close();
+}
+
+
 // ══════════════════════════════════════════════════════════════
 //  PATCHES FOR EXISTING FUNCTIONS
 //  Update handleLogin() and handleCheckSession() as shown below

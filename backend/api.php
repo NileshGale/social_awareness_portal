@@ -46,6 +46,12 @@ switch ($action) {
     case 'vote_reply':                handleVoteReply(); break;
     case 'like_feedback':             handleLikeFeedback(); break;
     case 'book_schedule':             handleBookSchedule(); break;
+    // ── ADMIN: Appointments ──
+    case 'admin_get_appointments':        handleAdminGetAppointments(); break;
+    case 'admin_update_appointment':     handleAdminUpdateAppointment(); break;
+    case 'admin_delete_appointment':     handleAdminDeleteAppointment(); break;
+    case 'admin_confirm_appointment':    handleAdminConfirmAppointment(); break;
+
     default:
         echo json_encode(['success' => false, 'message' => 'Invalid action']);
 }
