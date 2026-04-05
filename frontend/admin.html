@@ -71,13 +71,16 @@
             display: inline-flex;
             align-items: center;
             gap: 0.3rem;
-            background: linear-gradient(135deg, var(--navy), var(--blue));
+            background: linear-gradient(135deg, #0f172a, #2563eb);
             color: white;
             padding: 0.15rem 0.6rem;
             border-radius: 20px;
             font-size: 0.65rem;
             font-weight: 700;
+            text-transform: uppercase;
             letter-spacing: 0.04em;
+            vertical-align: middle;
+            margin-left: 0.5rem;
         }
 
         .nav-menu {
@@ -87,12 +90,20 @@
             align-items: center;
         }
 
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem; /* Standardized gap */
+            align-items: center;
+        }
+
         .nav-menu a {
             text-decoration: none;
             color: #374151;
             font-weight: 500;
             font-size: 0.9rem;
-            transition: color 0.2s;
+            transition: color 0.3s;
+            white-space: nowrap; /* Prevent wrapping */
         }
 
         .nav-menu a:hover,
@@ -1448,11 +1459,11 @@
         <div class="nav-container">
             <div class="logo">
                 <h2>
-                    <img src="../assets/logo.jpg" alt="Logo" style="height:32px;width:auto;vertical-align:middle;">
+                    <img src="../assets/logo.jpg" alt="Logo" style="height:35px;width:auto;vertical-align:middle;margin-right:8px;">
                     AwareX
-                    <span class="admin-badge"><i class="fas fa-shield-alt"></i> ADMIN</span>
+                    <span class="admin-badge"><i class="fas fa-shield-alt"></i> admin</span>
                 </h2>
-                <p>Administration Panel</p>
+                <p style="color: #6b7280; font-size: 0.78rem; margin-top: 2px;">Administration Panel</p>
             </div>
             <ul class="nav-menu">
                 <li><a href="index.html">Home</a></li>
@@ -1461,6 +1472,7 @@
                 <li><a href="campaigns.html">Campaigns</a></li>
                 <li><a href="appointment.html">Appointment</a></li>
                 <li><a href="#feedback" id="nav-feedback" onclick="showView('feedback')" class="active">Feedback</a></li>
+                <li style="display:none;"><a href="get_help.html">Get Help</a></li>
                 <li><a href="#account" id="nav-account" onclick="showView('account')" class="nav-btn-admin"><i class="fas fa-user-shield"></i> Your Account</a></li>
                 <li class="nav-noti">
                     <a href="#" title="Notifications">

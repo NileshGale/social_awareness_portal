@@ -71,16 +71,17 @@
         .nav-menu {
             display: flex;
             list-style: none;
-            gap: 1.8rem;
+            gap: 1.5rem; /* Standardized gap */
             align-items: center;
         }
 
         .nav-menu a {
             text-decoration: none;
-            color: var(--text);
+            color: #374151;
             font-weight: 500;
             font-size: 0.9rem;
             transition: color 0.3s;
+            white-space: nowrap; /* Prevent wrapping */
         }
 
         .nav-menu a:hover,
@@ -137,16 +138,16 @@
             display: inline-flex;
             align-items: center;
             gap: 0.3rem;
-            background: linear-gradient(135deg, var(--navy), var(--blue));
+            background: linear-gradient(135deg, #0f172a, #2563eb);
             color: white;
             padding: 0.15rem 0.6rem;
             border-radius: 20px;
             font-size: 0.65rem;
             font-weight: 700;
-            margin-left: 0.5rem;
-            vertical-align: middle;
             text-transform: uppercase;
             letter-spacing: 0.04em;
+            vertical-align: middle;
+            margin-left: 0.5rem;
         }
 
         .nav-btn-admin {
@@ -810,7 +811,7 @@
                 <li><a href="campaigns.html">Campaigns</a></li>
                 <li id="navAppointmentLi" style="display:none;"><a href="appointment.html">Appointment</a></li>
                 <li><a href="feedback.html">Feedback</a></li>
-                <li><a href="get_help.html">Get Help</a></li>
+                <li id="navGetHelpLi"><a href="get_help.html">Get Help</a></li>
                 <li><a href="account.html" class="nav-btn" id="navAccountBtn">Your Account</a></li>
                 <li class="nav-noti">
                     <a href="#" title="Notifications">
@@ -1083,17 +1084,25 @@
             const logoH2 = document.querySelector('.logo h2');
             const logoP = document.querySelector('.logo p');
             const acctBtn = document.getElementById('navAccountBtn');
-            if (logoH2 && !logoH2.querySelector('.admin-badge')) {
-                logoH2.innerHTML += '<span class="admin-badge"><i class="fas fa-shield-alt"></i> admin</span>';
+            
+            if (logoH2) {
+                logoH2.innerHTML = `<img src="../assets/logo.jpg" alt="Logo" style="height:35px;width:auto;vertical-align:middle;margin-right:8px;"> AwareX <span class="admin-badge"><i class="fas fa-shield-alt"></i> admin</span>`;
             }
-            if (logoP) logoP.textContent = 'Administration Panel';
+            if (logoP) {
+                logoP.textContent = 'Administration Panel';
+                logoP.style.cssText = 'color: #6b7280; font-size: 0.78rem; margin-top: 2px;';
+            }
+            
             if (acctBtn) {
                 acctBtn.href = 'admin.html#account';
                 acctBtn.classList.add('nav-btn-admin');
                 acctBtn.innerHTML = '<i class="fas fa-user-shield"></i> Your Account';
             }
+            
             const appointLi = document.getElementById('navAppointmentLi');
-            if (appointLi) appointLi.style.display = 'block';
+            const getHelpLi = document.getElementById('navGetHelpLi');
+            if (appointLi) appointLi.style.cssText = 'display: block !important;'; 
+            if (getHelpLi) getHelpLi.style.cssText = 'display: none !important;';
             const feedbackLink = document.querySelector('a[href="feedback.html"]');
             if (feedbackLink) feedbackLink.href = 'admin.html';
         }
