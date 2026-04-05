@@ -620,6 +620,19 @@
                 <label>Time</label>
                 <input type="time" id="edit-time">
             </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="edit-status" style="width: 100%; padding: 0.8rem 1rem; border: 2px solid #e5e7eb; border-radius: 12px; font-family: inherit; font-size: 0.95rem;">
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Meeting Link (Optional)</label>
+                <input type="url" id="edit-link" placeholder="https://zoom.p11...">
+            </div>
             <div class="modal-btns">
                 <button class="modal-btn btn-cancel" onclick="closeModal('editModal')">Cancel</button>
                 <button class="modal-btn btn-save-modal" id="saveEditBtn" onclick="submitEdit()">Save Changes</button>
@@ -786,6 +799,8 @@
             document.getElementById('edit-id').value = id;
             document.getElementById('edit-date').value = app.preferred_date;
             document.getElementById('edit-time').value = app.preferred_time;
+            document.getElementById('edit-status').value = app.status || 'pending';
+            document.getElementById('edit-link').value = app.meet_link || '';
             document.getElementById('editModal').classList.add('active');
         }
 
@@ -804,6 +819,7 @@
             const id = document.getElementById('edit-id').value;
             const date = document.getElementById('edit-date').value;
             const time = document.getElementById('edit-time').value;
+            const status = document.getElementById('edit-status').value;
             const link = document.getElementById('edit-link').value;
 
             if (!date || !time) { notify('Date and Time are required', 'error'); return; }
@@ -814,6 +830,8 @@
             fd.append('appointment_id', id);
             fd.append('preferred_date', date);
             fd.append('preferred_time', time);
+            fd.append('status', status);
+            fd.append('meet_link', link);
 
             try {
                 const r = await fetch(API, { method: 'POST', body: fd });

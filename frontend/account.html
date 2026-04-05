@@ -600,6 +600,43 @@
             justify-content: center;
         }
 
+        /* NOTIFICATIONS STYLES */
+        .tab-noti-badge {
+            background: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+            font-weight: 700;
+        }
+        .notifications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .notification-item {
+            padding: 1.2rem;
+            background: #f9fafb;
+            border-radius: 12px;
+            border-left: 4px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        .notification-item.unread {
+            background: #f0f9ff;
+            border-left-color: #3b82f6;
+        }
+        .noti-time {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-bottom: 0.4rem;
+        }
+        .noti-msg {
+            font-size: 0.92rem;
+            color: #374151;
+            line-height: 1.5;
+        }
+
         .upload-thumb:hover .upload-thumb-overlay {
             background: rgba(0, 0, 0, 0.4);
         }
@@ -882,6 +919,10 @@
             <button class="tab-btn" onclick="switchTab('logout', this)">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
+            <button class="tab-btn" id="notiTabBtn" onclick="switchTab('notifications', this)">
+                <i class="fas fa-bell"></i> Notifications
+                <span class="tab-noti-badge" id="tabNotiBadge" style="display:none;">0</span>
+            </button>
         </div>
 
         <!-- ── TAB 1: YOUR PROFILE ── -->
@@ -992,6 +1033,25 @@
             </div>
         </div>
 
+        <!-- ── TAB 5: NOTIFICATIONS ── -->
+        <div class="tab-content" id="tab-notifications">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                    <h3><i class="fas fa-bell"></i> Your Notifications</h3>
+                    <button class="btn-save" style="padding:0.5rem 1rem; font-size:0.8rem; background:var(--navy);" onclick="markAllRead()">
+                        Mark All as Read
+                    </button>
+                </div>
+                <div id="notificationsList" class="notifications-list">
+                    <!-- Notifications will be injected here -->
+                    <div style="text-align:center; padding:3rem; color:#9ca3af;">
+                        <i class="fas fa-bell-slash" style="font-size:2.5rem; margin-bottom:1rem; display:block; opacity:0.3;"></i>
+                        <p>No new notifications</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div><!-- /loggedInContent -->
 
     <!-- VIEW INCIDENT MODAL -->
@@ -1073,6 +1133,15 @@
                 document.getElementById('p-mobile').value = data.user.mobile || '';
                 document.getElementById('p-dob').value = data.user.dob || '';
                 document.getElementById('p-gender').value = data.user.gender || 'Male';
+
+                // Check Hash
+                const h = window.location.hash.replace('#', '');
+                if (['profile','upload','myuploads','notifications'].includes(h)) {
+                    switchTab(h);
+                }
+
+                // Initial poll for notifications
+                checkNotifications();
             } catch (e) {
                 document.getElementById('notLoggedIn').style.display = 'block';
             }
@@ -1082,9 +1151,22 @@
         function switchTab(name, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('tab-' + name).classList.add('active');
+            
+            if (btn) btn.classList.add('active');
+            else {
+                // If called without btn (from hash), find btn by ID or text
+                const b = document.getElementById('notiTabBtn') || Array.from(document.querySelectorAll('.tab-btn')).find(x => x.textContent.toLowerCase().includes(name));
+                if (b) b.classList.add('active');
+            }
+
+            const target = document.getElementById('tab-' + name);
+            if (target) target.classList.add('active');
+
             if (name === 'myuploads') loadMyUploads();
+            if (name === 'notifications') {
+                loadNotifications();
+                markAllRead(false);
+            }
         }
 
         // ─── PROFILE SAVE ──────────────────────────────────────────────
@@ -1330,6 +1412,65 @@
 
         // Instant check from cache to prevent flicker
         if (sessionStorage.getItem('is_admin') === '1') applyAdminBranding();
+
+        // ─── NOTIFICATIONS ─────────────────────────────────────────────
+        async function checkNotifications() {
+            try {
+                const r = await fetch('../backend/api.php?action=get_notifications');
+                const d = await r.json();
+                if (d.success) {
+                    const dot = document.querySelector('.nav-noti-dot');
+                    const badge = document.getElementById('tabNotiBadge');
+                    if (d.unread_count > 0) {
+                        if (dot) dot.style.display = 'block';
+                        if (badge) {
+                            badge.textContent = d.unread_count;
+                            badge.style.display = 'inline-block';
+                        }
+                    } else {
+                        if (dot) dot.style.display = 'none';
+                        if (badge) badge.style.display = 'none';
+                    }
+                }
+            } catch (e) {}
+        }
+
+        async function loadNotifications() {
+            const listEl = document.getElementById('notificationsList');
+            try {
+                const r = await fetch('../backend/api.php?action=get_notifications');
+                const d = await r.json();
+                if (d.success) {
+                    if (d.notifications.length === 0) {
+                        listEl.innerHTML = `<div style="text-align:center; padding:3rem; color:#9ca3af;">
+                            <i class="fas fa-bell-slash" style="font-size:2.5rem; margin-bottom:1rem; display:block; opacity:0.3;"></i>
+                            <p>No notifications yet</p>
+                        </div>`;
+                        return ;
+                    }
+                    listEl.innerHTML = d.notifications.map(n => `
+                        <div class="notification-item ${n.is_read == 0 ? 'unread' : ''}">
+                            <div class="noti-time">${new Date(n.created_at).toLocaleString()}</div>
+                            <div class="noti-msg">${n.message}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {}
+        }
+
+        async function markAllRead(refresh = true) {
+            try {
+                const r = await fetch('../backend/api.php?action=mark_notifications_read');
+                const d = await r.json();
+                if (d.success) {
+                    const dot = document.querySelector('.nav-noti-dot');
+                    if (dot) dot.style.display = 'none';
+                    const badge = document.getElementById('tabNotiBadge');
+                    if (badge) badge.style.display = 'none';
+                    if (refresh) loadNotifications();
+                }
+            } catch (e) {}
+        }
 
         init();
         // ── 20-Minute Idle Auto-Logout ─────────────────────────────────

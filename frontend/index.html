@@ -1133,10 +1133,30 @@
                     document.getElementById('heroRegisterBtn').style.display = 'inline-block';
                     document.getElementById('ctaRegisterBtn').style.display = 'inline-block';
                 }
+
+                // If logged in, check for notifications
+                if (data.logged_in) {
+                    checkNotifications();
+                    // Optional: Poll every 1 minute
+                    setInterval(checkNotifications, 60000);
+                }
             }).catch(() => {
                 document.getElementById('heroRegisterBtn').style.display = 'inline-block';
                 document.getElementById('ctaRegisterBtn').style.display = 'inline-block';
             });
+
+        async function checkNotifications() {
+            try {
+                const r = await fetch('../backend/api.php?action=get_notifications');
+                const d = await r.json();
+                if (d.success) {
+                    const dot = document.querySelector('.nav-noti-dot');
+                    if (dot) {
+                        dot.style.display = (d.unread_count > 0) ? 'block' : 'none';
+                    }
+                }
+            } catch (e) {}
+        }
         // ── 20-Minute Idle Auto-Logout ─────────────────────────────────
         (function() {
             let timeout;

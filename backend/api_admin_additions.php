@@ -622,7 +622,7 @@ function handleAdminGetAppointments() {
     echo json_encode(['success' => true, 'appointments' => $appointments]);
 }
 
-// ── Update appointment date/time/link ──
+// ── Update appointment date/time/link/status ──
 function handleAdminUpdateAppointment() {
     global $conn;
     if (!isAdmin()) {
@@ -634,22 +634,125 @@ function handleAdminUpdateAppointment() {
     $preferred_date = sanitizeInput($_POST['preferred_date'] ?? '');
     $preferred_time = sanitizeInput($_POST['preferred_time'] ?? '');
     $meet_link      = sanitizeInput($_POST['meet_link'] ?? '');
+    $status         = sanitizeInput($_POST['status'] ?? 'pending');
 
     if (!$id || !$preferred_date || !$preferred_time) {
         echo json_encode(['success' => false, 'message' => 'ID, date, and time are required']);
         return;
     }
 
-    $stmt = $conn->prepare("UPDATE schedule_bookings SET preferred_date=?, preferred_time=?, meet_link=? WHERE id=?");
-    $stmt->bind_param("sssi", $preferred_date, $preferred_time, $meet_link, $id);
+    // Fetch previous data to see what changed
+    $stmt = $conn->prepare("SELECT * FROM schedule_bookings WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $old = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$old) {
+        echo json_encode(['success' => false, 'message' => 'Appointment not found']);
+        return;
+    }
+
+    $stmt = $conn->prepare("UPDATE schedule_bookings SET preferred_date=?, preferred_time=?, meet_link=?, status=? WHERE id=?");
+    $stmt->bind_param("ssssi", $preferred_date, $preferred_time, $meet_link, $status, $id);
     
     if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Appointment updated successfully']);
+        // Create Notification for the user
+        if ($old['user_id']) {
+            $msg = "Your appointment on " . date('d-M-Y', strtotime($preferred_date)) . " has been updated to Status: " . strtoupper($status);
+            if ($preferred_date != $old['preferred_date'] || $preferred_time != $old['preferred_time']) {
+                $msg = "Your appointment has been rescheduled to " . date('d-M-Y', strtotime($preferred_date)) . " at " . date('h:i A', strtotime($preferred_time));
+            }
+            
+            $stmt_noti = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
+            $stmt_noti->bind_param("is", $old['user_id'], $msg);
+            $stmt_noti->execute();
+            $stmt_noti->close();
+        }
+
+        // Send Email Notification
+        $subject = "Update on Your Appointment Request - AwareX";
+        $status_label = strtoupper($status);
+        $date_f = date('d-M-Y', strtotime($preferred_date));
+        $time_f = date('h:i A', strtotime($preferred_time));
+        
+        $email_body = "
+        <html>
+        <body style='font-family: sans-serif; color: #333; line-height: 1.6;'>
+            <div style='max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden;'>
+                <div style='background: #1e3a8a; color: white; padding: 30px; text-align: center;'>
+                    <h2 style='margin:0;'>Appointment Update</h2>
+                </div>
+                <div style='padding: 30px;'>
+                    <p>Hello <strong>" . htmlspecialchars($old['name']) . "</strong>,</p>
+                    <p>There has been an update regarding your consultation request from AwareX side.</p>
+                    
+                    <div style='background: #f8faff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px; margin: 20px 0;'>
+                        <p style='margin: 0 0 10px 0;'><strong>Current Status:</strong> <span style='color: #e84545; font-weight: bold;'>$status_label</span></p>
+                        <p style='margin: 0 0 10px 0;'><strong>Date:</strong> $date_f</p>
+                        <p style='margin: 0 0 10px 0;'><strong>Time:</strong> $time_f</p>
+                        " . ($meet_link ? "<p style='margin: 0;'><strong>Meeting Link:</strong> <a href='$meet_link' style='color: #1e3a8a;'>Join Meeting</a></p>" : "") . "
+                    </div>
+                    
+                    <p>If you have any questions or the new time doesn't work for you, please contact us or submit a new request.</p>
+                    <p>Thank you for your patience.</p>
+                </div>
+                <div style='background: #f9fafb; padding: 20px; text-align: center; font-size: 0.85em; color: #777;'>
+                    AwareX Administration Panel
+                </div>
+            </div>
+        </body>
+        </html>";
+
+        sendNotificationEmail($old['email'], $subject, $email_body);
+
+        echo json_encode(['success' => true, 'message' => 'Appointment updated and user notified successfully']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Failed to update appointment']);
     }
     $stmt->close();
 }
+
+// ── GET notifications for user ──
+function handleGetNotifications() {
+    global $conn;
+    if (!isLoggedIn()) {
+        echo json_encode(['success' => false, 'message' => 'Login required']);
+        return;
+    }
+    $user_id = getCurrentUserId();
+    $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id=? ORDER BY created_at DESC LIMIT 20");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $notifications = $res->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+
+    // Check count of unread
+    $stmt = $conn->prepare("SELECT COUNT(*) as unread FROM notifications WHERE user_id=? AND is_read=0");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $unread = $stmt->get_result()->fetch_assoc()['unread'];
+    $stmt->close();
+
+    echo json_encode(['success' => true, 'notifications' => $notifications, 'unread_count' => (int)$unread]);
+}
+
+// ── Mark notifications as read ──
+function handleMarkNotificationsRead() {
+    global $conn;
+    if (!isLoggedIn()) {
+        echo json_encode(['success' => false, 'message' => 'Login required']);
+        return;
+    }
+    $user_id = getCurrentUserId();
+    $stmt = $conn->prepare("UPDATE notifications SET is_read=1 WHERE user_id=? AND is_read=0");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stmt->close();
+    echo json_encode(['success' => true, 'message' => 'Notifications cleared']);
+}
+
 
 // ── Delete appointment ──
 function handleAdminDeleteAppointment() {
