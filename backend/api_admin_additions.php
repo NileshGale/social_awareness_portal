@@ -21,14 +21,8 @@
 // ── STEP 2: Also update handleLogin() and handleCheckSession()
 //    to return is_admin field (patches shown at bottom of file)
 
-// ══════════════════════════════════════════════════════════════
-//  NEW FUNCTIONS
-// ══════════════════════════════════════════════════════════════
-
-function isAdmin() {
-    // Use session flag set during login — avoids extra DB query
-    return isLoggedIn() && isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1;
-}
+// ── NEW FUNCTIONS
+// ──────────────────────────────────────────────────────────────
 
 // ── Get ALL feedbacks for admin with replies and vote counts ──
 function handleAdminGetFeedbacks() {
@@ -515,27 +509,53 @@ function handleLikeFeedback() {
 // ── Book a Schedule ──
 function handleBookSchedule() {
     global $conn;
-    $name          = sanitizeInput($_POST['name'] ?? '');
-    $email         = sanitizeInput($_POST['email'] ?? '');
-    $mobile        = sanitizeInput($_POST['mobile'] ?? '');
-    $problem_desc  = sanitizeInput($_POST['problem_desc'] ?? '');
+    $name           = sanitizeInput($_POST['name'] ?? '');
+    $email          = sanitizeInput($_POST['email'] ?? '');
+    $mobile         = sanitizeInput($_POST['mobile'] ?? '');
+    $problem_desc   = sanitizeInput($_POST['problem_desc'] ?? '');
     $preferred_date = sanitizeInput($_POST['preferred_date'] ?? '');
-    $user_id       = isLoggedIn() ? getCurrentUserId() : null;
+    $preferred_time = sanitizeInput($_POST['preferred_time'] ?? '');
+    $user_id        = isLoggedIn() ? getCurrentUserId() : null;
 
-    if (!$name || !$email || !$mobile || !$problem_desc || !$preferred_date) {
+    if (!$name || !$email || !$mobile || !$problem_desc || !$preferred_date || !$preferred_time) {
         echo json_encode(['success' => false, 'message' => 'All fields are required']);
         return;
     }
 
-    // Validate date is in the future
+    // ── Validation: Date Range (Today to +1 Month) ──
     $today = date('Y-m-d');
-    if ($preferred_date <= $today) {
-        echo json_encode(['success' => false, 'message' => 'Please select a future date']);
+    $maxDate = date('Y-m-d', strtotime('+1 month'));
+
+    if ($preferred_date < $today) {
+        echo json_encode(['success' => false, 'message' => 'Please select a future date (current or later)']);
+        return;
+    }
+    if ($preferred_date > $maxDate) {
+        echo json_encode(['success' => false, 'message' => 'Consultations can only be booked up to 1 month in advance']);
         return;
     }
 
-    $stmt = $conn->prepare("INSERT INTO schedule_bookings (user_id, name, email, mobile, problem_desc, preferred_date) VALUES (?,?,?,?,?,?)");
-    $stmt->bind_param("isssss", $user_id, $name, $email, $mobile, $problem_desc, $preferred_date);
+    // ── Validation: Time Range (09:00 AM to 06:00 PM) ──
+    $startTime = "09:00";
+    $endTime   = "18:00";
+    
+    if ($preferred_time < $startTime || $preferred_time > $endTime) {
+        echo json_encode(['success' => false, 'message' => 'Consultations are only available between 09:00 AM and 06:00 PM']);
+        return;
+    }
+
+    // ── Verification: Future Time (If date is today) ──
+    if ($preferred_date === $today) {
+        $currentTime = date('H:i');
+        if ($preferred_time <= $currentTime) {
+            echo json_encode(['success' => false, 'message' => 'Please select a future time for today']);
+            return;
+        }
+    }
+
+    $stmt = $conn->prepare("INSERT INTO schedule_bookings (user_id, name, email, mobile, problem_desc, preferred_date, preferred_time) VALUES (?,?,?,?,?,?,?)");
+    $stmt->bind_param("issssss", $user_id, $name, $email, $mobile, $problem_desc, $preferred_date, $preferred_time);
+    
     if ($stmt->execute()) {
         // Send email to admin
         $admin_email = "dhanashreegame@gmail.com";
@@ -543,8 +563,8 @@ function handleBookSchedule() {
         $email_body = "
         <html>
         <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
-            <h2 style='color: #1e3a8a;'>New Schedule Booking Request on Zoom or Google Meet</h2>
-            <p>You have received a new schedule booking request from AwareX. Here are the details:</p>
+            <h2 style='color: #1e3a8a;'>New Consultation Booking Request</h2>
+            <p>A new schedule booking request has been received from AwareX:</p>
             <table style='width: 100%; border-collapse: collapse; margin-top: 20px;'>
                 <tr>
                     <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold; width: 30%;'>Full Name</td>
@@ -559,8 +579,8 @@ function handleBookSchedule() {
                     <td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($mobile) . "</td>
                 </tr>
                 <tr>
-                    <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Preferred Date</td>
-                    <td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($preferred_date) . "</td>
+                    <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Preferred Appointment</td>
+                    <td style='padding: 10px; border: 1px solid #ddd;'>" . date('d-M-Y', strtotime($preferred_date)) . " at " . date('h:i A', strtotime($preferred_time)) . "</td>
                 </tr>
                 <tr>
                     <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Problem Description</td>
@@ -572,7 +592,6 @@ function handleBookSchedule() {
         </html>
         ";
         
-        // Use the generic send notification function with Reply-To header
         $reply_to = ['email' => $email, 'name' => $name];
         sendNotificationEmail($admin_email, $subject, $email_body, $reply_to);
 

@@ -59,4 +59,12 @@ header('Access-Control-Allow-Headers: Content-Type');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
+
+// ── Timezone ──
+date_default_timezone_set('Asia/Kolkata');
+
+// ── Admin Helper ──
+function isAdmin() {
+    return isLoggedIn() && isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1;
+}
 ?>

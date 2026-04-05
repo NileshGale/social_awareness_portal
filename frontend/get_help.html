@@ -545,6 +545,10 @@
                         <label><i class="fas fa-calendar-alt"></i> Preferred Date</label>
                         <input type="date" id="s-date" required>
                     </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> Preferred Time</label>
+                        <input type="time" id="s-time" required>
+                    </div>
                     <div class="form-group full">
                         <label><i class="fas fa-comment-medical"></i> Describe Your Problem Briefly</label>
                         <textarea id="s-problem" rows="4" placeholder="Please describe your concern or problem in brief so we can prepare for the consultation..." required></textarea>
@@ -641,10 +645,14 @@
         (function() {
             // Set min and max dates
             const dateInput = document.getElementById('s-date');
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            dateInput.min = tomorrow.toISOString().split('T')[0];
+            const timeInput = document.getElementById('s-time');
+            const today = new Date();
+            
+            // Min date: Today
+            const todayStr = today.toISOString().split('T')[0];
+            dateInput.min = todayStr;
 
+            // Max date: Today + 1 Month
             const nextMonth = new Date();
             nextMonth.setMonth(nextMonth.getMonth() + 1);
             dateInput.max = nextMonth.toISOString().split('T')[0];
@@ -653,14 +661,40 @@
                 e.preventDefault();
                 const btn = document.getElementById('scheduleBtn');
                 const dateVal = document.getElementById('s-date').value;
-                const today = new Date().toISOString().split('T')[0];
+                const timeVal = document.getElementById('s-time').value;
+                
+                const alertEl = document.getElementById('schedule-alert');
+                alertEl.style.display = 'none';
 
-                if (dateVal <= today) {
-                    const el = document.getElementById('schedule-alert');
-                    el.textContent = 'Please select a date after today.';
-                    el.className = 'alert error';
-                    el.style.display = 'block';
+                // ── Date Validation ──
+                if (dateVal < todayStr) {
+                    alertEl.textContent = 'Please select a future date.';
+                    alertEl.className = 'alert error';
+                    alertEl.style.display = 'block';
                     return;
+                }
+
+                // ── Time Selection Validation (09:00 AM to 06:00 PM) ──
+                if (timeVal < "09:00" || timeVal > "18:00") {
+                    alertEl.textContent = 'Consultations are only available between 09:00 AM and 06:00 PM.';
+                    alertEl.className = 'alert error';
+                    alertEl.style.display = 'block';
+                    return;
+                }
+
+                // ── Today Future Time Validation ──
+                if (dateVal === todayStr) {
+                    const now = new Date();
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    const currentTime = `${hours}:${minutes}`;
+                    
+                    if (timeVal <= currentTime) {
+                        alertEl.textContent = 'Please select a future time for today.';
+                        alertEl.className = 'alert error';
+                        alertEl.style.display = 'block';
+                        return;
+                    }
                 }
 
                 btn.disabled = true;
@@ -673,6 +707,7 @@
                 fd.append('mobile', document.getElementById('s-mobile').value);
                 fd.append('problem_desc', document.getElementById('s-problem').value);
                 fd.append('preferred_date', dateVal);
+                fd.append('preferred_time', timeVal);
 
                 try {
                     const res = await fetch('../backend/api.php', { method: 'POST', body: fd });
@@ -737,15 +772,15 @@
                     const sName = document.getElementById('s-name');
                     const sEmail = document.getElementById('s-email');
                     const sMobile = document.getElementById('s-mobile');
-                    if (sName && !sName.value) sName.value = data.user.full_name || '';
-                    if (sEmail && !sEmail.value) sEmail.value = data.user.email || '';
-                    if (sMobile && !sMobile.value) sMobile.value = data.user.mobile || '';
+                    if (sName && !sName.value) { sName.value = data.user.full_name || ''; sName.readOnly = true; }
+                    if (sEmail && !sEmail.value) { sEmail.value = data.user.email || ''; sEmail.readOnly = true; }
+                    if (sMobile && !sMobile.value) { sMobile.value = data.user.mobile || ''; sMobile.readOnly = true; }
 
                     // Contact Section Form
                     const cName = document.getElementById('c-name');
                     const cEmail = document.getElementById('c-email');
-                    if (cName && !cName.value) cName.value = data.user.full_name || '';
-                    if (cEmail && !cEmail.value) cEmail.value = data.user.email || '';
+                    if (cName && !cName.value) { cName.value = data.user.full_name || ''; cName.readOnly = true; }
+                    if (cEmail && !cEmail.value) { cEmail.value = data.user.email || ''; cEmail.readOnly = true; }
                 }
             }).catch(() => { });
         // ── 20-Minute Idle Auto-Logout ─────────────────────────────────
