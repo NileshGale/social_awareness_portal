@@ -511,9 +511,13 @@
             </div>
             <ul class="nav-menu">
                 <li><a href="index.html">Home</a></li>
-                <li><a href="admin.html">Admin Dashboard</a></li>
-                <li><a href="appointment.html" class="active">Appointments</a></li>
-                <li><a href="account.html" class="nav-btn-admin">Your Account</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="awareness-topics.html">Awareness Topics</a></li>
+                <li><a href="campaigns.html">Campaigns</a></li>
+                <li id="navAppointmentLi"><a href="appointment.html" class="active">Appointment</a></li>
+                <li><a href="feedback.html" id="navFeedbackLink">Feedback</a></li>
+                <li><a href="get_help.html" style="display:none;">Get Help</a></li>
+                <li><a href="admin.html#account" class="nav-btn-admin" id="navAccountBtn"><i class="fas fa-user-shield"></i> Your Account</a></li>
                 <li class="nav-noti">
                     <a href="#" title="Notifications">
                         <i class="fas fa-bell"></i>
@@ -880,9 +884,31 @@
             }
         }
 
+        function applyAdminBranding() {
+            document.body.classList.add('is-admin');
+            const logoH2 = document.querySelector('.logo h2');
+            const logoP = document.querySelector('.logo p');
+            if (logoH2 && !logoH2.querySelector('.admin-badge')) {
+                logoH2.innerHTML += '<span class="admin-badge"><i class="fas fa-shield-alt"></i> admin</span>';
+            }
+            if (logoP) logoP.textContent = 'Administration Panel';
+            
+            const feedbackLink = document.getElementById('navFeedbackLink');
+            if (feedbackLink) feedbackLink.href = 'admin.html';
+        }
+
         // Init
-        checkAuth();
-        fetchAppointments();
+        fetch('../backend/api.php?action=check_session')
+            .then(r => r.json())
+            .then(data => {
+                if (!data.logged_in || data.user.is_admin != 1) {
+                    window.location.href = 'login.html';
+                } else {
+                    applyAdminBranding();
+                    fetchAppointments();
+                }
+            })
+            .catch(() => window.location.href = 'login.html');
 
     </script>
 </body>

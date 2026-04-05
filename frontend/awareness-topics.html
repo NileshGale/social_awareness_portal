@@ -550,8 +550,8 @@
                 <li><a href="about.html">About</a></li>
                 <li><a href="awareness-topics.html" class="active">Awareness Topics</a></li>
                 <li><a href="campaigns.html">Campaigns</a></li>
-                <li><a href="feedback.html">Feedback</a></li>
                 <li id="navAppointmentLi" style="display:none;"><a href="appointment.html">Appointment</a></li>
+                <li><a href="feedback.html">Feedback</a></li>
                 <li><a href="get_help.html">Get Help</a></li>
                 <li><a href="account.html" class="nav-btn" id="navAccountBtn">Your Account</a></li>
                 <li class="nav-noti">
@@ -1263,8 +1263,6 @@
             if (appointLi) appointLi.style.display = 'block';
             const feedbackLink = document.querySelector('a[href="feedback.html"]');
             if (feedbackLink) feedbackLink.href = 'admin.html';
-            const contactLi = document.querySelector('a[href="get_help.html"]')?.parentElement;
-            if (contactLi) contactLi.style.display = 'none';
         }
 
         if (sessionStorage.getItem('is_admin') === '1') applyAdminBranding();

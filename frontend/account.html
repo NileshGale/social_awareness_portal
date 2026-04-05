@@ -806,8 +806,8 @@
                 <li><a href="about.html">About</a></li>
                 <li><a href="awareness-topics.html">Awareness Topics</a></li>
                 <li><a href="campaigns.html">Campaigns</a></li>
-                <li><a href="feedback.html">Feedback</a></li>
                 <li id="navAppointmentLi" style="display:none;"><a href="appointment.html">Appointment</a></li>
+                <li><a href="feedback.html">Feedback</a></li>
                 <li><a href="get_help.html">Get Help</a></li>
                 <li><a href="account.html" class="nav-btn" id="navAccountBtn">Your Account</a></li>
                 <li class="nav-noti">
@@ -1004,11 +1004,15 @@
                     document.getElementById('notLoggedIn').style.display = 'block';
                     return;
                 }
-                currentUser = data.user;
-                // If admin lands on account.html, send them to admin panel
-                if (data.user.is_admin == 1) {
+                function applyAdminBranding() {
                     document.body.classList.add('is-admin');
+                    const logoH2 = document.querySelector('.logo h2');
+                    const logoP = document.querySelector('.logo p');
                     const acctBtn = document.getElementById('navAccountBtn');
+                    if (logoH2 && !logoH2.querySelector('.admin-badge')) {
+                        logoH2.innerHTML += '<span class="admin-badge"><i class="fas fa-shield-alt"></i> admin</span>';
+                    }
+                    if (logoP) logoP.textContent = 'Administration Panel';
                     if (acctBtn) {
                         acctBtn.href = 'admin.html#account';
                         acctBtn.classList.add('nav-btn-admin');
@@ -1016,6 +1020,13 @@
                     }
                     const appointLi = document.getElementById('navAppointmentLi');
                     if (appointLi) appointLi.style.display = 'block';
+                    const feedbackLink = document.querySelector('a[href="feedback.html"]');
+                    if (feedbackLink) feedbackLink.href = 'admin.html';
+                }
+                currentUser = data.user;
+                // If admin lands on account.html, send them to admin panel
+                if (data.user.is_admin == 1) {
+                    applyAdminBranding();
                     window.location.href = 'admin.html';
                     return;
                 }
