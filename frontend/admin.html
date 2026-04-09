@@ -1379,6 +1379,43 @@
             transform: translateY(-1px);
         }
 
+        /* ── Modals ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 450px;
+            padding: 2.2rem;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+            animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes pop { from { opacity: 0; transform: scale(0.9) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        .modal h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--navy); margin-bottom: 0.6rem; }
+        .modal p { color: #6b7280; font-size: 0.9rem; margin-bottom: 1.5rem; }
+
+        .modal-btns { display: flex; gap: 0.8rem; margin-top: 1.8rem; }
+        .modal-btn { flex: 1; padding: 0.9rem; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; border: none; }
+        .btn-cancel { background: #f3f4f6; color: #4b5563; }
+        .btn-cancel:hover { background: #e5e7eb; }
+        .btn-save-modal { background: var(--blue); color: white; }
+        .btn-save-modal:hover { background: var(--navy); box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3); }
+
         /* ── Access Denied ── */
         #access-denied {
             display: none;
@@ -1748,6 +1785,24 @@
         </div>
     </div>
 
+    <!-- Admin Deletion Modal -->
+    <div class="modal-overlay" id="deleteConfirmModal">
+        <div class="modal" style="text-align: center;">
+            <div style="width: 60px; height: 60px; background: #fef2f2; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.8rem;">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h3 id="deleteModalTitle">Confirm Deletion</h3>
+            <p id="deleteModalText">Are you sure you want to perform this action? This cannot be undone.</p>
+            <input type="hidden" id="delete-type">
+            <input type="hidden" id="delete-id">
+            <input type="hidden" id="delete-user-id">
+            <div class="modal-btns">
+                <button class="modal-btn btn-cancel" onclick="closeModal('deleteConfirmModal')">No, Cancel</button>
+                <button class="modal-btn btn-save-modal" id="deleteActionBtn" style="background: #dc2626;" onclick="submitDeleteFromModal()">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; 2026 AwareX. All rights reserved.</p>
         <p><i class="fas fa-map-marker-alt"></i> Nagpur, Maharashtra 440016, India &nbsp;|&nbsp; <i
@@ -2026,9 +2081,15 @@
         }
 
         /* ── Delete Reply ── */
-        async function deleteReply(fid) {
-            if (!confirm('Delete this admin reply? Users will no longer see it.')) return;
+        function deleteReply(fid) {
+            document.getElementById('delete-id').value = fid;
+            document.getElementById('delete-type').value = 'reply';
+            document.getElementById('deleteModalTitle').textContent = 'Delete Admin Reply';
+            document.getElementById('deleteModalText').textContent = 'Delete this admin reply? Users will no longer see it.';
+            document.getElementById('deleteConfirmModal').classList.add('active');
+        }
 
+        async function proceedDeleteReply(fid) {
             const fd = new FormData();
             fd.append('action', 'admin_delete_reply');
             fd.append('feedback_id', fid);
@@ -2051,9 +2112,15 @@
         }
 
         /* ── Delete Entire Feedback ── */
-        async function deleteFeedback(fid) {
-            if (!confirm('Are you sure you want to permanently delete this feedback?\nThis will also remove all replies, likes, and votes associated with it.\nThis action cannot be undone.')) return;
+        function deleteFeedback(fid) {
+            document.getElementById('delete-id').value = fid;
+            document.getElementById('delete-type').value = 'feedback';
+            document.getElementById('deleteModalTitle').textContent = 'Delete Feedback';
+            document.getElementById('deleteModalText').innerHTML = 'Are you sure you want to permanently delete this feedback?<br>This will also remove all replies, likes, and votes.';
+            document.getElementById('deleteConfirmModal').classList.add('active');
+        }
 
+        async function proceedDeleteFeedback(fid) {
             const fd = new FormData();
             fd.append('action', 'admin_delete_feedback');
             fd.append('feedback_id', fid);
@@ -2221,9 +2288,16 @@
             }
         }
 
-        async function adminDeleteCampaign(campaignId, userId) {
-            if (!confirm('Permanently delete this campaign? This cannot be undone.')) return;
+        function adminDeleteCampaign(campaignId, userId) {
+            document.getElementById('delete-id').value = campaignId;
+            document.getElementById('delete-user-id').value = userId;
+            document.getElementById('delete-type').value = 'campaign';
+            document.getElementById('deleteModalTitle').textContent = 'Delete Campaign';
+            document.getElementById('deleteModalText').textContent = 'Permanently delete this campaign? This cannot be undone.';
+            document.getElementById('deleteConfirmModal').classList.add('active');
+        }
 
+        async function proceedDeleteCampaign(campaignId, userId) {
             const fd = new FormData();
             fd.append('action', 'admin_delete_campaign');
             fd.append('campaign_id', campaignId);
@@ -2343,6 +2417,65 @@
             window.onkeydown = resetTimer;
             window.addEventListener('scroll', resetTimer, true);
         })();
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        async function submitDeleteFromModal() {
+            const id = document.getElementById('delete-id').value;
+            const type = document.getElementById('delete-type').value;
+            
+            setLoading('deleteActionBtn', true);
+            
+            if (type === 'reply') await proceedDeleteReply(id);
+            else if (type === 'feedback') await proceedDeleteFeedback(id);
+            else if (type === 'campaign') await proceedDeleteCampaign(id);
+            
+            setLoading('deleteActionBtn', false);
+            closeModal('deleteConfirmModal');
+        }
+
+        function setLoading(id, loading) {
+            const btn = document.getElementById(id);
+            if (loading) {
+                btn.dataset.old = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = btn.dataset.old;
+            }
+        }
+        async function submitDeleteFromModal() {
+            const id = document.getElementById('delete-id').value;
+            const type = document.getElementById('delete-type').value;
+            const userId = document.getElementById('delete-user-id').value;
+            
+            setLoading('deleteActionBtn', true);
+            
+            if (type === 'reply') await proceedDeleteReply(id);
+            else if (type === 'feedback') await proceedDeleteFeedback(id);
+            else if (type === 'campaign') await proceedDeleteCampaign(id, userId);
+            
+            setLoading('deleteActionBtn', false);
+            closeModal('deleteConfirmModal');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function setLoading(id, loading) {
+            const btn = document.getElementById(id);
+            if (loading) {
+                btn.dataset.old = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = btn.dataset.old;
+            }
+        }
     </script>
 </body>
 </html>

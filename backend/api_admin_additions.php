@@ -570,6 +570,17 @@ function handleBookSchedule() {
 }
 
 
+// ── Conflict Check Helper ──
+function isAppointmentConflicting($date, $time, $exclude_id = 0) {
+    global $conn;
+    $stmt = $conn->prepare("SELECT id FROM schedule_bookings WHERE preferred_date=? AND preferred_time=? AND status='confirmed' AND id!=?");
+    $stmt->bind_param("ssi", $date, $time, $exclude_id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $conflict = $res->num_rows > 0;
+    $stmt->close();
+    return $conflict;
+}
 // ── Get ALL appointments for admin ──
 function handleAdminGetAppointments() {
     global $conn;
@@ -600,11 +611,16 @@ function handleAdminUpdateAppointment() {
     $id             = (int)($_POST['appointment_id'] ?? 0);
     $preferred_date = sanitizeInput($_POST['preferred_date'] ?? '');
     $preferred_time = sanitizeInput($_POST['preferred_time'] ?? '');
-    $meet_link      = sanitizeInput($_POST['meet_link'] ?? '');
-    $status         = sanitizeInput($_POST['status'] ?? 'pending');
 
     if (!$id || !$preferred_date || !$preferred_time) {
-        echo json_encode(['success' => false, 'message' => 'ID, date, and time are required']);
+        echo json_encode(['success' => false, 'message' => 'All fields are required']);
+        return;
+    }
+
+    // Time validation: 9 AM to 6 PM
+    $hour = (int)date('H', strtotime($preferred_time));
+    if ($hour < 9 || $hour >= 18) {
+        echo json_encode(['success' => false, 'message' => 'Error: Scheduling is only allowed between 09:00 AM and 06:00 PM.']);
         return;
     }
 
@@ -620,56 +636,48 @@ function handleAdminUpdateAppointment() {
         return;
     }
 
-    $stmt = $conn->prepare("UPDATE schedule_bookings SET preferred_date=?, preferred_time=?, meet_link=?, status=? WHERE id=?");
-    if (!$stmt) {
-        echo json_encode(['success' => false, 'message' => 'Database error (prepare failed): ' . $conn->error]);
-        return;
-    }
-    $stmt->bind_param("ssssi", $preferred_date, $preferred_time, $meet_link, $status, $id);
+    // Update ONLY timing details, reset status to 'pending' to require user approval
+    $stmt = $conn->prepare("UPDATE schedule_bookings SET preferred_date=?, preferred_time=?, status='pending' WHERE id=?");
+    $stmt->bind_param("ssi", $preferred_date, $preferred_time, $id);
     
     if ($stmt->execute()) {
-        // Create Notification for the user
+        $date_f = date('d-M-Y', strtotime($preferred_date));
+        $time_f = date('h:i A', strtotime($preferred_time));
+
+        // Create specialized notification for user
         if ($old['user_id']) {
-            $msg = "Your appointment on " . date('d-M-Y', strtotime($preferred_date)) . " has been updated to Status: " . strtoupper($status);
-            if ($preferred_date != $old['preferred_date'] || $preferred_time != $old['preferred_time']) {
-                $msg = "Your appointment has been rescheduled to " . date('d-M-Y', strtotime($preferred_date)) . " at " . date('h:i A', strtotime($preferred_time));
-            }
+            $msg = "Admin has proposed a new time for your consultation: $date_f at $time_f. Please approve or delete the request below.";
             
-            $stmt_noti = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
-            $stmt_noti->bind_param("is", $old['user_id'], $msg);
+            $stmt_noti = $conn->prepare("INSERT INTO notifications (user_id, message, type, appointment_id) VALUES (?, ?, 'reschedule_request', ?)");
+            $stmt_noti->bind_param("isi", $old['user_id'], $msg, $id);
             $stmt_noti->execute();
             $stmt_noti->close();
         }
 
         // Send Email Notification
-        $subject = "Update on Your Appointment Request - AwareX";
-        $status_label = strtoupper($status);
-        $date_f = date('d-M-Y', strtotime($preferred_date));
-        $time_f = date('h:i A', strtotime($preferred_time));
+        $subject = "Reschedule Requested for Your Appointment - AwareX";
         
         $email_body = "
         <html>
         <body style='font-family: sans-serif; color: #333; line-height: 1.6;'>
             <div style='max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden;'>
                 <div style='background: #1e3a8a; color: white; padding: 30px; text-align: center;'>
-                    <h2 style='margin:0;'>Appointment Update</h2>
+                    <h2 style='margin:0;'>Reschedule Requested</h2>
                 </div>
                 <div style='padding: 30px;'>
                     <p>Hello <strong>" . htmlspecialchars($old['name']) . "</strong>,</p>
-                    <p>There has been an update regarding your consultation request from AwareX side.</p>
+                    <p>Our admin has proposed a new time for your consultation request.</p>
                     
                     <div style='background: #f8faff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px; margin: 20px 0;'>
-                        <p style='margin: 0 0 10px 0;'><strong>Current Status:</strong> <span style='color: #e84545; font-weight: bold;'>$status_label</span></p>
-                        <p style='margin: 0 0 10px 0;'><strong>Date:</strong> $date_f</p>
-                        <p style='margin: 0 0 10px 0;'><strong>Time:</strong> $time_f</p>
-                        " . ($meet_link ? "<p style='margin: 0;'><strong>Meeting Link:</strong> <a href='$meet_link' style='color: #1e3a8a;'>Join Meeting</a></p>" : "") . "
+                        <p style='margin: 0 0 10px 0;'><strong>Proposed Date:</strong> $date_f</p>
+                        <p style='margin: 0 0 10px 0;'><strong>Proposed Time:</strong> $time_f</p>
                     </div>
                     
-                    <p>If you have any questions or the new time doesn't work for you, please contact us or submit a new request.</p>
-                    <p>Thank you for your patience.</p>
+                    <p>Please log in to your dashboard to <strong>Approve</strong> or <strong>Delete</strong> this rescheduled slot.</p>
+                    <p>Thank you for your cooperation.</p>
                 </div>
                 <div style='background: #f9fafb; padding: 20px; text-align: center; font-size: 0.85em; color: #777;'>
-                    AwareX Administration Panel
+                    AwareX Administration Team
                 </div>
             </div>
         </body>
@@ -799,11 +807,10 @@ function handleAdminConfirmAppointment() {
         return;
     }
 
-    $id        = (int)($_POST['appointment_id'] ?? 0);
-    $meet_link = sanitizeInput($_POST['meet_link'] ?? '');
+    $id = (int)($_POST['appointment_id'] ?? 0);
 
-    if (!$id || !$meet_link) {
-        echo json_encode(['success' => false, 'message' => 'Appointment ID and meeting link are required']);
+    if (!$id) {
+        echo json_encode(['success' => false, 'message' => 'Appointment ID is required']);
         return;
     }
 
@@ -819,11 +826,29 @@ function handleAdminConfirmAppointment() {
         return;
     }
 
-    // Update status and link in DB
-    $stmt = $conn->prepare("UPDATE schedule_bookings SET status='confirmed', meet_link=? WHERE id=?");
-    $stmt->bind_param("si", $meet_link, $id);
+    // CHECK FOR CONFLICT
+    if (isAppointmentConflicting($booking['preferred_date'], $booking['preferred_time'], $id)) {
+        echo json_encode(['success' => false, 'message' => 'Error: Another appointment is already confirmed for this Date/Time. Please reschedule this request first.']);
+        return;
+    }
+
+    // Update status to 'confirmed' in DB
+    $stmt = $conn->prepare("UPDATE schedule_bookings SET status='confirmed' WHERE id=?");
+    $stmt->bind_param("i", $id);
     
     if ($stmt->execute()) {
+        // Create in-app notification for user
+        if ($booking['user_id']) {
+            $date_f = date('d-M-Y', strtotime($booking['preferred_date']));
+            $time_f = date('h:i A', strtotime($booking['preferred_time']));
+            $msg = "Your appointment on $date_f at $time_f has been confirmed! Please be available at the scheduled time.";
+            
+            $stmt_noti = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
+            $stmt_noti->bind_param("is", $booking['user_id'], $msg);
+            $stmt_noti->execute();
+            $stmt_noti->close();
+        }
+
         // Send confirmation email to user
         $subject = "Consultation Confirmed - AwareX";
         $email_body = "
@@ -840,11 +865,10 @@ function handleAdminConfirmAppointment() {
                     <div style='background: #f8faff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px; margin: 20px 0;'>
                         <p style='margin: 0 0 10px 0;'><strong>Date:</strong> " . date('d-M-Y', strtotime($booking['preferred_date'])) . "</p>
                         <p style='margin: 0 0 10px 0;'><strong>Time:</strong> " . date('h:i A', strtotime($booking['preferred_time'])) . "</p>
-                        <p style='margin: 0;'><strong>Meeting Link:</strong> <a href='" . $meet_link . "' style='color: #1e3a8a; text-decoration: underline; font-weight: bold;'>Join Meeting</a></p>
                     </div>
                                         
                     <p>Please ensure you are ready 5 minutes before the scheduled time.</p>
-                    <p>If you have any questions, feel free to reply to this email.</p>
+                    <p>Our team will contact you shortly regarding the meeting link.</p>
                 </div>
                 <div style='background: #f9fafb; padding: 20px; text-align: center; font-size: 0.85em; color: #777;'>
                     &copy; 2026 AwareX Team. All rights reserved.
@@ -856,9 +880,96 @@ function handleAdminConfirmAppointment() {
         
         sendNotificationEmail($booking['email'], $subject, $email_body);
 
-        echo json_encode(['success' => true, 'message' => 'Appointment confirmed and email sent!']);
+        echo json_encode(['success' => true, 'message' => 'Appointment confirmed and user notified!']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Failed to confirm appointment']);
+    }
+    $stmt->close();
+}
+
+/**
+ * Send meeting link to user (Post-Confirmation)
+ */
+function handleAdminSendMeetLink() {
+    global $conn;
+    if (!isAdmin()) {
+        echo json_encode(['success' => false, 'message' => 'Admin access required']);
+        return;
+    }
+
+    $id   = (int)($_POST['appointment_id'] ?? 0);
+    $link = sanitizeInput($_POST['meet_link'] ?? '');
+
+    if (!$id || !$link) {
+        echo json_encode(['success' => false, 'message' => 'ID and meeting link are required']);
+        return;
+    }
+
+    // Fetch appointment details
+    $stmt = $conn->prepare("SELECT * FROM schedule_bookings WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $booking = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$booking) {
+        echo json_encode(['success' => false, 'message' => 'Appointment not found']);
+        return;
+    }
+
+    // Update meet_link in DB
+    $stmt = $conn->prepare("UPDATE schedule_bookings SET meet_link=? WHERE id=?");
+    $stmt->bind_param("si", $link, $id);
+    
+    if ($stmt->execute()) {
+        // Create in-app notification for user
+        if ($booking['user_id']) {
+            $date_f = date('d-M-Y', strtotime($booking['preferred_date']));
+            $msg = "The meeting link for your consultation on $date_f has been shared: <a href='$link' target='_blank' style='color:#1e3a8a; font-weight:bold; text-decoration:underline;'>$link</a>";
+            
+            $stmt_noti = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
+            $stmt_noti->bind_param("is", $booking['user_id'], $msg);
+            $stmt_noti->execute();
+            $stmt_noti->close();
+        }
+
+        // Send Email
+        $subject = "Meeting Link for Your Consultation - AwareX";
+        $email_body = "
+        <html>
+        <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
+            <div style='max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden;'>
+                <div style='background: #1e3a8a; color: white; padding: 30px; text-align: center;'>
+                    <h2 style='margin: 0;'>Meeting Link Details</h2>
+                </div>
+                <div style='padding: 30px;'>
+                    <p>Hello <strong>" . htmlspecialchars($booking['name']) . "</strong>,</p>
+                    <p>The meeting link for your upcoming consultation has been generated:</p>
+                    
+                    <div style='background: #f8faff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px; text-align: center; margin: 20px 0;'>
+                        <p style='margin-bottom: 15px; font-weight: bold;'>Join via Zoom / Google Meet:</p>
+                        <a href='$link' style='display: inline-block; background: #1e3a8a; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold;'>Start Meeting</a>
+                        <p style='margin-top: 15px; font-size: 0.85em; color: #666;'>Or copy this URL: $link</p>
+                    </div>
+                                        
+                    <hr style='border: 0; border-top: 1px solid #eee; margin: 25px 0;'>
+                    <p><strong>Appointment Details:</strong></p>
+                    <p>Date: " . date('d-M-Y', strtotime($booking['preferred_date'])) . "<br>Time: " . date('h:i A', strtotime($booking['preferred_time'])) . "</p>
+                    <p>Please ensure you are ready 5 minutes before the scheduled time.</p>
+                </div>
+                <div style='background: #f9fafb; padding: 20px; text-align: center; font-size: 0.85em; color: #777;'>
+                    &copy; 2026 AwareX Team.
+                </div>
+            </div>
+        </body>
+        </html>
+        ";
+        
+        sendNotificationEmail($booking['email'], $subject, $email_body);
+
+        echo json_encode(['success' => true, 'message' => 'Meeting link shared successfully!']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to share meeting link']);
     }
     $stmt->close();
 }
@@ -899,4 +1010,73 @@ WITH:
 
 ──────────────────────────────────────────────────────────────
 */
+/**
+ * Handle user response to reschedule request
+ */
+function handleUserActionOnAppointment() {
+    global $conn;
+    if (!isLoggedIn()) {
+        echo json_encode(['success' => false, 'message' => 'Login required']);
+        return;
+    }
+
+    $user_id = getCurrentUserId();
+    $id      = (int)($_POST['appointment_id'] ?? 0);
+    $action  = sanitizeInput($_POST['user_action'] ?? '');
+    $noti_id = (int)($_POST['notification_id'] ?? 0);
+
+    if (!$id || !$action) {
+        echo json_encode(['success' => false, 'message' => 'Missing ID or Action']);
+        return;
+    }
+
+    $stmt = $conn->prepare("SELECT * FROM schedule_bookings WHERE id=? AND user_id=?");
+    $stmt->bind_param("ii", $id, $user_id);
+    $stmt->execute();
+    $booking = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$booking) {
+        echo json_encode(['success' => false, 'message' => 'Appointment not found or access denied']);
+        return;
+    }
+
+    if ($action === 'approve') {
+        if (isAppointmentConflicting($booking['preferred_date'], $booking['preferred_time'], $id)) {
+            echo json_encode(['success' => false, 'message' => 'Error: This slot was just booked by someone else. Admin will pick another time.']);
+            return;
+        }
+
+        $stmt = $conn->prepare("UPDATE schedule_bookings SET status='confirmed' WHERE id=?");
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            $msg = "Appointment for " . date('d-M-Y', strtotime($booking['preferred_date'])) . " has been confirmed by you.";
+            if ($noti_id) {
+                $stmt_upd = $conn->prepare("UPDATE notifications SET message=?, type='message' WHERE id=? AND user_id=?");
+                $stmt_upd->bind_param("sii", $msg, $noti_id, $user_id);
+                $stmt_upd->execute();
+                $stmt_upd->close();
+            }
+            echo json_encode(['success' => true, 'message' => 'Appointment confirmed successfully!']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to confirm appointment']);
+        }
+        $stmt->close();
+    } else if ($action === 'delete') {
+        $stmt = $conn->prepare("DELETE FROM schedule_bookings WHERE id=?");
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            if ($noti_id) {
+                $stmt_noti = $conn->prepare("DELETE FROM notifications WHERE id=?");
+                $stmt_noti->bind_param("i", $noti_id);
+                $stmt_noti->execute();
+                $stmt_noti->close();
+            }
+            echo json_encode(['success' => true, 'message' => 'Appointment deleted successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to delete appointment']);
+        }
+        $stmt->close();
+    }
+}
 ?>

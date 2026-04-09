@@ -620,19 +620,6 @@
                 <label>Time</label>
                 <input type="time" id="edit-time">
             </div>
-            <div class="form-group">
-                <label>Status</label>
-                <select id="edit-status" style="width: 100%; padding: 0.8rem 1rem; border: 2px solid #e5e7eb; border-radius: 12px; font-family: inherit; font-size: 0.95rem;">
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Meeting Link (Optional)</label>
-                <input type="url" id="edit-link" placeholder="https://zoom.p11...">
-            </div>
             <div class="modal-btns">
                 <button class="modal-btn btn-cancel" onclick="closeModal('editModal')">Cancel</button>
                 <button class="modal-btn btn-save-modal" id="saveEditBtn" onclick="submitEdit()">Save Changes</button>
@@ -640,19 +627,56 @@
         </div>
     </div>
 
-    <!-- Confirm Link Modal -->
+    <!-- Custom Confirmation Modal -->
     <div class="modal-overlay" id="confirmModal">
-        <div class="modal">
-            <h3>Confirm Appointment</h3>
-            <p>Paste the meeting link below. An email will be sent automatically to the user with these details.</p>
-            <input type="hidden" id="confirm-id">
-            <div class="form-group">
-                <label>Meeting Link (Zoom/Meet)</label>
-                <input type="url" id="confirm-link" placeholder="https://meet.google.com/..." required>
+        <div class="modal" style="text-align: center;">
+            <div style="width: 60px; height: 60px; background: #fff7ed; color: #ea580c; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.8rem;">
+                <i class="fas fa-exclamation-triangle"></i>
             </div>
+            <h3>Confirm Appointment</h3>
+            <p id="confirmModalText">Are you sure you want to confirm this appointment?</p>
+            <input type="hidden" id="confirm-id">
             <div class="modal-btns">
-                <button class="modal-btn btn-cancel" onclick="closeModal('confirmModal')">Cancel</button>
-                <button class="modal-btn btn-save-modal" id="sendLinkBtn" onclick="submitConfirm()">Send Link & Confirm</button>
+                <button class="modal-btn btn-cancel" onclick="closeModal('confirmModal')">No, Cancel</button>
+                <button class="modal-btn btn-save-modal" id="confirmActionBtn" onclick="submitConfirmFromModal()">Yes, Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Send Link Modal -->
+    <div class="modal-overlay" id="sendLinkModal">
+        <div class="modal">
+            <div style="width: 60px; height: 60px; background: #eff6ff; color: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem; font-size: 1.5rem;">
+                <i class="fas fa-video"></i>
+            </div>
+            <h3 style="text-align:center;">Share Meeting Link</h3>
+            <p style="text-align:center; margin-bottom:1.5rem;">The link will be sent to the user's email and dashboard notifications.</p>
+            
+            <input type="hidden" id="send-link-id">
+            <div class="form-group">
+                <label>Meeting URL (Zoom/Google Meet/etc.)</label>
+                <input type="url" id="meet-url-input" placeholder="https://meet.google.com/abc-defg-hij" required>
+            </div>
+            
+            <div class="modal-btns">
+                <button class="modal-btn btn-cancel" onclick="closeModal('sendLinkModal')">Cancel</button>
+                <button class="modal-btn btn-save-modal" id="sendLinkBtn" onclick="submitSendLink()">Send Link Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteConfirmModal">
+        <div class="modal" style="text-align: center;">
+            <div style="width: 60px; height: 60px; background: #fef2f2; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.8rem;">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h3>Delete Appointment</h3>
+            <p>Are you sure you want to delete this appointment booking? <br><strong>This action cannot be undone.</strong></p>
+            <input type="hidden" id="delete-id">
+            <div class="modal-btns">
+                <button class="modal-btn btn-cancel" onclick="closeModal('deleteConfirmModal')">No, Cancel</button>
+                <button class="modal-btn btn-save-modal" id="deleteActionBtn" style="background: #dc2626;" onclick="submitDeleteFromModal()">Yes, Delete</button>
             </div>
         </div>
     </div>
@@ -740,12 +764,6 @@
                                 <i class="fas fa-clock"></i>
                                 <span class="time-badge">${timeFriendly}</span>
                             </div>
-                            ${app.meet_link ? `
-                                <div class="schedule-item" style="font-size:0.7rem; color:var(--admin-blue); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                    <i class="fas fa-link"></i>
-                                    <span>${app.meet_link}</span>
-                                </div>
-                            ` : ''}
                         </div>
 
                         <div class="actions-col">
@@ -760,11 +778,15 @@
                                 <button class="btn-icon btn-delete" onclick="deleteAppointment(${app.id})" title="Delete">
                                     <i class="fas fa-trash"></i>
                                 </button>
-                                ${app.status === 'pending' ? `
+                                 ${app.status === 'pending' ? `
                                     <button class="btn-confirm" onclick="openConfirm(${app.id})">
-                                        <i class="fas fa-video"></i> Confirm
+                                        <i class="fas fa-check"></i> Confirm
                                     </button>
-                                ` : ''}
+                                ` : (app.status === 'confirmed' ? `
+                                    <button class="btn-confirm" onclick="openSendLink(${app.id})" style="background:#059669;">
+                                        <i class="fas fa-paper-plane"></i> Send Link
+                                    </button>
+                                ` : '')}
                             </div>
                         </div>
                     </div>
@@ -799,15 +821,23 @@
             document.getElementById('edit-id').value = id;
             document.getElementById('edit-date').value = app.preferred_date;
             document.getElementById('edit-time').value = app.preferred_time;
-            document.getElementById('edit-status').value = app.status || 'pending';
-            document.getElementById('edit-link').value = app.meet_link || '';
             document.getElementById('editModal').classList.add('active');
         }
 
         function openConfirm(id) {
+            const app = allAppointments.find(a => a.id == id);
+            const name = app ? app.name : 'this user';
             document.getElementById('confirm-id').value = id;
-            document.getElementById('confirm-link').value = '';
+            document.getElementById('confirmModalText').innerHTML = `Are you sure you want to confirm the appointment with <strong>${name}</strong>?`;
             document.getElementById('confirmModal').classList.add('active');
+        }
+
+        async function submitConfirmFromModal() {
+            const id = document.getElementById('confirm-id').value;
+            setLoading('confirmActionBtn', true);
+            await submitConfirm(id);
+            setLoading('confirmActionBtn', false);
+            closeModal('confirmModal');
         }
 
         function closeModal(id) {
@@ -819,19 +849,19 @@
             const id = document.getElementById('edit-id').value;
             const date = document.getElementById('edit-date').value;
             const time = document.getElementById('edit-time').value;
-            const status = document.getElementById('edit-status').value;
-            const link = document.getElementById('edit-link').value;
-
-            if (!date || !time) { notify('Date and Time are required', 'error'); return; }
-
+            
+            // Time validation: 9 AM (09:00) to 6 PM (18:00)
+            if (time < "09:00" || time > "18:00") {
+                notify('Scheduling is only allowed between 09:00 AM and 06:00 PM.', 'error');
+                return;
+            }
+            
             setLoading('saveEditBtn', true);
             const fd = new FormData();
             fd.append('action', 'admin_update_appointment');
             fd.append('appointment_id', id);
             fd.append('preferred_date', date);
             fd.append('preferred_time', time);
-            fd.append('status', status);
-            fd.append('meet_link', link);
 
             try {
                 const r = await fetch(API, { method: 'POST', body: fd });
@@ -847,35 +877,87 @@
             setLoading('saveEditBtn', false);
         }
 
-        async function submitConfirm() {
-            const id = document.getElementById('confirm-id').value;
-            const link = document.getElementById('confirm-link').value.trim();
-
-            if (!link) { notify('Meeting link is required', 'error'); return; }
-
-            setLoading('sendLinkBtn', true);
+        async function submitConfirm(id) {
             const fd = new FormData();
             fd.append('action', 'admin_confirm_appointment');
             fd.append('appointment_id', id);
-            fd.append('meet_link', link);
+
+            // Find the confirm button to show loading
+            const btn = document.querySelector(`.appointment-card[data-id="${id}"] .btn-confirm`);
+            const btnHtml = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            }
 
             try {
                 const r = await fetch(API, { method: 'POST', body: fd });
                 const d = await r.json();
                 if (d.success) {
                     notify(d.message, 'success');
-                    closeModal('confirmModal');
                     fetchAppointments();
                 } else {
                     notify(d.message, 'error');
                 }
             } catch (e) { notify('Error confirming appointment', 'error'); }
+            
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = btnHtml;
+            }
+        }
+
+        // Send Link Modal Functions
+        function openSendLink(id) {
+            document.getElementById('send-link-id').value = id;
+            document.getElementById('meet-url-input').value = '';
+            document.getElementById('sendLinkModal').classList.add('active');
+            
+            // Focus the input
+            setTimeout(() => document.getElementById('meet-url-input').focus(), 100);
+        }
+
+        async function submitSendLink() {
+            const id = document.getElementById('send-link-id').value;
+            const url = document.getElementById('meet-url-input').value.trim();
+
+            if (!url) {
+                notify('Please enter a valid meeting URL', 'error');
+                return;
+            }
+
+            setLoading('sendLinkBtn', true);
+            const fd = new FormData();
+            fd.append('action', 'admin_send_meet_link');
+            fd.append('appointment_id', id);
+            fd.append('meet_link', url);
+
+            try {
+                const r = await fetch(API, { method: 'POST', body: fd });
+                const d = await r.json();
+                if (d.success) {
+                    notify(d.message, 'success');
+                    closeModal('sendLinkModal');
+                    // Refresh data to show updated link in logic if needed
+                    fetchAppointments();
+                } else {
+                    notify(d.message, 'error');
+                }
+            } catch (e) {
+                notify('Database or network error sharing link', 'error');
+            }
             setLoading('sendLinkBtn', false);
         }
 
         async function deleteAppointment(id) {
-            if (!confirm('Are you sure you want to delete this appointment booking? This cannot be undone.')) return;
+            document.getElementById('delete-id').value = id;
+            document.getElementById('deleteConfirmModal').classList.add('active');
+        }
 
+        async function submitDeleteFromModal() {
+            const id = document.getElementById('delete-id').value;
+            setLoading('deleteActionBtn', true);
+            
             const fd = new FormData();
             fd.append('action', 'admin_delete_appointment');
             fd.append('appointment_id', id);
@@ -885,11 +967,15 @@
                 const d = await r.json();
                 if (d.success) {
                     notify(d.message, 'success');
+                    closeModal('deleteConfirmModal');
                     fetchAppointments();
                 } else {
                     notify(d.message, 'error');
                 }
-            } catch (e) { notify('Error deleting appointment', 'error'); }
+            } catch (e) {
+                notify('Error deleting appointment', 'error');
+            }
+            setLoading('deleteActionBtn', false);
         }
 
         // Helpers
