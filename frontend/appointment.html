@@ -471,6 +471,76 @@
         .btn-save-modal { background: var(--admin-blue); color: white; }
         .btn-save-modal:hover { background: var(--navy); box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3); }
 
+        .modal-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .close-modal {
+            background: #f3f4f6;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            background: #e5e7eb;
+            color: var(--navy);
+            transform: rotate(90deg);
+        }
+
+        #new-admin-note {
+            transition: all 0.3s ease;
+        }
+
+        #new-admin-note:focus {
+            outline: none;
+            border-color: var(--admin-blue);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Custom scrollbar for history */
+        #notes-history-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        #notes-history-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        #notes-history-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .note-del-btn:hover {
+            opacity: 1 !important;
+            background: #ffe4e6 !important;
+            color: #ef4444 !important;
+            transform: scale(1.1);
+        }
+
+        #notes-history-container > div:hover .note-del-btn {
+            opacity: 1;
+        }
+
+        /* Ensure button is at least partially visible or clearly present */
+        .note-del-btn {
+            opacity: 0.4;
+            transition: all 0.2s;
+        }
+
         /* ── Alerts ── */
         #main-alert {
             position: fixed;
@@ -627,6 +697,36 @@
         </div>
     </div>
 
+    <!-- Note History Modal -->
+    <div class="modal-overlay" id="noteModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-top">
+                <h3>Admin Internal Notes</h3>
+                <button class="close-modal" onclick="closeModal('noteModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem;">
+                <input type="hidden" id="note-appt-id">
+                
+                <div id="notes-history-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                    <!-- Notes will be loaded here -->
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="font-weight: 600; color: var(--navy); margin-bottom: 0.5rem; display: block;">Add New Note</label>
+                    <textarea id="new-admin-note" placeholder="Type internal advice or notes here..." style="width: 100%; height: 100px; padding: 0.8rem; border: 2px solid #e5e7eb; border-radius: 12px; font-family: inherit; resize: none;"></textarea>
+                    <div id="editing-note-info" style="display:none; margin-top:0.5rem; font-size:0.78rem; color:var(--admin-blue); font-weight:600;">
+                        <i class="fas fa-edit"></i> Editing an existing note... 
+                        <span onclick="cancelEditNote()" style="text-decoration:underline; cursor:pointer; margin-left:10px; color:#6b7280;">Cancel Edit</span>
+                    </div>
+                </div>
+
+                <div class="modal-btns" style="display: flex; gap: 1rem;">
+                    <button class="modal-btn btn-save-modal" id="saveNoteBtn" onclick="submitAddNote()" style="flex: 1;">Save Note</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom Confirmation Modal -->
     <div class="modal-overlay" id="confirmModal">
         <div class="modal" style="text-align: center;">
@@ -777,6 +877,9 @@
                                 </button>
                                 <button class="btn-icon btn-delete" onclick="deleteAppointment(${app.id})" title="Delete">
                                     <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="btn-icon btn-note" onclick="openNoteModal(${app.id})" title="Admin Notes" style="background:#f3f4f6; color:#4b5563;">
+                                    <i class="fas fa-clipboard-list"></i>
                                 </button>
                                  ${app.status === 'pending' ? `
                                     <button class="btn-confirm" onclick="openConfirm(${app.id})">
@@ -984,6 +1087,113 @@
             let ampm = h >= 12 ? 'PM' : 'AM';
             h = h % 12 || 12;
             return `${h}:${m} ${ampm}`;
+        }
+
+        // Note Modal Logic
+        let editingNoteId = null;
+
+        async function openNoteModal(id) {
+            document.getElementById('note-appt-id').value = id;
+            cancelEditNote();
+            document.getElementById('noteModal').classList.add('active');
+            loadAppointmentNotes(id);
+        }
+
+        function prepareEditNote(noteObj) {
+            editingNoteId = noteObj.id;
+            document.getElementById('new-admin-note').value = noteObj.admin_note;
+            document.getElementById('saveNoteBtn').textContent = 'Update Note';
+            document.getElementById('editing-note-info').style.display = 'block';
+            document.getElementById('new-admin-note').focus();
+        }
+
+        function cancelEditNote() {
+            editingNoteId = null;
+            document.getElementById('new-admin-note').value = '';
+            document.getElementById('saveNoteBtn').textContent = 'Save Note';
+            document.getElementById('editing-note-info').style.display = 'none';
+        }
+
+        async function loadAppointmentNotes(apptId) {
+            const container = document.getElementById('notes-history-container');
+            container.innerHTML = '<div style="text-align:center; padding:1rem; color:#9ca3af;"><i class="fas fa-spinner fa-spin"></i> Loading notes...</div>';
+            
+            const fd = new FormData();
+            fd.append('action', 'admin_get_notes');
+            fd.append('appointment_id', apptId);
+
+            try {
+                const r = await fetch(API, { method: 'POST', body: fd });
+                const d = await r.json();
+                if (d.success) {
+                    if (d.notes.length === 0) {
+                        container.innerHTML = '<div style="text-align:center; padding:1.5rem; color:#9ca3af; background:#f9fafb; border-radius:12px; font-size:0.85rem;">No notes recorded for this user yet.</div>';
+                        return;
+                    }
+                    container.innerHTML = d.notes.map(n => `
+                        <div style="background:white; border: 1px solid #f1f5f9; border-radius: 16px; padding: 1.2rem; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 0.2rem;">
+                            <div style="font-size: 0.72rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px;">${new Date(n.created_at).toLocaleString()}</div>
+                            <div style="font-size: 0.92rem; color: #334155; line-height: 1.6; padding-right: 4rem; font-family: 'DM Sans', sans-serif;">${n.admin_note}</div>
+                            <div style="position: absolute; top: 1.2rem; right: 1.2rem; display: flex; gap: 0.5rem;">
+                                <button onclick='prepareEditNote(${JSON.stringify(n)})' style="background: #eff6ff; border: none; width: 28px; height: 28px; border-radius: 50%; color: var(--admin-blue); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" class="note-edit-btn" title="Edit Note">
+                                    <i class="fas fa-pen" style="font-size: 0.7rem;"></i>
+                                </button>
+                                <button onclick="executeDeleteNote(${n.id}, ${apptId})" style="background: #fff1f2; border: none; width: 28px; height: 28px; border-radius: 50%; color: #ef4444; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; pointer-events: auto;" class="note-del-btn" title="Delete Note">
+                                    <i class="fas fa-trash" style="font-size: 0.75rem;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                container.innerHTML = '<div style="text-align:center; color:#ef4444;">Failed to load notes.</div>';
+            }
+        }
+
+        async function submitAddNote() {
+            const id = document.getElementById('note-appt-id').value;
+            const note = document.getElementById('new-admin-note').value.trim();
+            if (!note) return;
+
+            setLoading('saveNoteBtn', true);
+            const fd = new FormData();
+            fd.append('action', editingNoteId ? 'admin_update_note' : 'admin_add_note');
+            if (editingNoteId) fd.append('note_id', editingNoteId);
+            fd.append('appointment_id', id);
+            fd.append('admin_note', note);
+
+            try {
+                const r = await fetch(API, { method: 'POST', body: fd });
+                const d = await r.json();
+                if (d.success) {
+                    cancelEditNote();
+                    loadAppointmentNotes(id);
+                } else {
+                    notify(d.message, 'error');
+                }
+            } catch (e) {
+                notify('Connection error', 'error');
+            } finally {
+                setLoading('saveNoteBtn', false);
+            }
+        }
+
+        async function executeDeleteNote(noteId, apptId) {
+            const fd = new FormData();
+            fd.append('action', 'admin_delete_note');
+            fd.append('note_id', noteId);
+
+            try {
+                const r = await fetch(API, { method: 'POST', body: fd });
+                const d = await r.json();
+                if (d.success) {
+                    loadAppointmentNotes(apptId);
+                } else {
+                    notify(d.message, 'error');
+                }
+            } catch (e) {
+                notify('Connection error', 'error');
+            }
         }
 
         function notify(msg, type) {

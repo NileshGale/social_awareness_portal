@@ -1079,4 +1079,112 @@ function handleUserActionOnAppointment() {
         $stmt->close();
     }
 }
+/**
+ * Get note history for an appointment
+ */
+function handleAdminGetNotes() {
+    global $conn;
+    if (!isAdmin()) {
+        echo json_encode(['success' => false, 'message' => 'Admin access required']);
+        return;
+    }
+
+    $id = (int)($_POST['appointment_id'] ?? 0);
+    if (!$id) {
+        echo json_encode(['success' => false, 'message' => 'Appointment ID required']);
+        return;
+    }
+
+    $stmt = $conn->prepare("SELECT * FROM appointment_notes WHERE appointment_id=? ORDER BY created_at DESC");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $notes = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+
+    echo json_encode(['success' => true, 'notes' => $notes]);
+}
+
+/**
+ * Add a new note to the history
+ */
+function handleAdminAddNote() {
+    global $conn;
+    if (!isAdmin()) {
+        echo json_encode(['success' => false, 'message' => 'Admin access required']);
+        return;
+    }
+
+    $id   = (int)($_POST['appointment_id'] ?? 0);
+    $note = sanitizeInput($_POST['admin_note'] ?? '');
+
+    if (!$id || !$note) {
+        echo json_encode(['success' => false, 'message' => 'ID and note content are required']);
+        return;
+    }
+
+    $stmt = $conn->prepare("INSERT INTO appointment_notes (appointment_id, admin_note) VALUES (?, ?)");
+    $stmt->bind_param("is", $id, $note);
+    
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Note added successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to add note']);
+    }
+    $stmt->close();
+}
+
+/**
+ * Delete a specific note entry
+ */
+function handleAdminDeleteNote() {
+    global $conn;
+    if (!isAdmin()) {
+        echo json_encode(['success' => false, 'message' => 'Admin access required']);
+        return;
+    }
+
+    $note_id = (int)($_POST['note_id'] ?? 0);
+    if (!$note_id) {
+        echo json_encode(['success' => false, 'message' => 'Note ID required']);
+        return;
+    }
+
+    $stmt = $conn->prepare("DELETE FROM appointment_notes WHERE id=?");
+    $stmt->bind_param("i", $note_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Note deleted successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to delete note']);
+    }
+    $stmt->close();
+}
+/**
+ * Update an existing note
+ */
+function handleAdminUpdateNote() {
+    global $conn;
+    if (!isAdmin()) {
+        echo json_encode(['success' => false, 'message' => 'Admin access required']);
+        return;
+    }
+
+    $note_id = (int)($_POST['note_id'] ?? 0);
+    $new_text = sanitizeInput($_POST['admin_note'] ?? '');
+
+    if (!$note_id || !$new_text) {
+        echo json_encode(['success' => false, 'message' => 'Note ID and content required']);
+        return;
+    }
+
+    $stmt = $conn->prepare("UPDATE appointment_notes SET admin_note=? WHERE id=?");
+    $stmt->bind_param("si", $new_text, $note_id);
+    
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Note updated successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to update note']);
+    }
+    $stmt->close();
+}
 ?>

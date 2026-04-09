@@ -52,6 +52,10 @@ switch ($action) {
     case 'admin_delete_appointment':     handleAdminDeleteAppointment(); break;
     case 'admin_confirm_appointment':    handleAdminConfirmAppointment(); break;
     case 'admin_send_meet_link':       handleAdminSendMeetLink(); break;
+    case 'admin_get_notes':            handleAdminGetNotes(); break;
+    case 'admin_add_note':             handleAdminAddNote(); break;
+    case 'admin_delete_note':          handleAdminDeleteNote(); break;
+    case 'admin_update_note':          handleAdminUpdateNote(); break;
     case 'user_action_on_appointment':   handleUserActionOnAppointment(); break;
     case 'get_notifications':            handleGetNotifications(); break;
     case 'mark_notifications_read':      handleMarkNotificationsRead(); break;
