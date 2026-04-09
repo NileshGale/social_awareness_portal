@@ -1104,8 +1104,28 @@ function handleAdminGetNotes() {
         return;
     }
 
-    $stmt = $conn->prepare("SELECT * FROM appointment_notes WHERE appointment_id=? ORDER BY created_at DESC");
+    // 1. Find the email for this appointment to track history by person
+    $stmt = $conn->prepare("SELECT email FROM schedule_bookings WHERE id = ?");
     $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows === 0) {
+        $stmt->close();
+        echo json_encode(['success' => false, 'message' => 'Appointment not found']);
+        return;
+    }
+    $email = $res->fetch_assoc()['email'];
+    $stmt->close();
+
+    // 2. Fetch all notes for all appointments associated with this email
+    $query = "SELECT n.*, s.preferred_date, s.preferred_time 
+              FROM appointment_notes n
+              JOIN schedule_bookings s ON n.appointment_id = s.id
+              WHERE s.email = ?
+              ORDER BY s.preferred_date DESC, n.created_at DESC";
+    
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $email);
     $stmt->execute();
     $notes = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();

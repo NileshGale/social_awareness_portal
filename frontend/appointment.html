@@ -1231,23 +1231,35 @@
                         container.innerHTML = '<div style="text-align:center; padding:1.5rem; color:#9ca3af; background:#f9fafb; border-radius:12px; font-size:0.85rem;">No notes recorded for this user yet.</div>';
                         return;
                     }
-                    container.innerHTML = d.notes.map(n => `
-                        <div style="background:white; border: 1px solid #f1f5f9; border-radius: 16px; padding: 1.2rem; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 0.2rem;">
-                            <div style="font-size: 0.72rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px;">${new Date(n.created_at).toLocaleString()}</div>
-                            <div style="font-size: 0.92rem; color: #334155; line-height: 1.6; padding-right: 4rem; font-family: 'DM Sans', sans-serif;">${n.admin_note}</div>
-                            <div style="position: absolute; top: 1.2rem; right: 1.2rem; display: flex; gap: 0.5rem;">
-                                <button onclick='prepareEditNote(${JSON.stringify(n)})' style="background: #eff6ff; border: none; width: 28px; height: 28px; border-radius: 50%; color: var(--admin-blue); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" class="note-edit-btn" title="Edit Note">
-                                    <i class="fas fa-pen" style="font-size: 0.7rem;"></i>
-                                </button>
-                                <button onclick="executeDeleteNote(${n.id}, ${apptId})" style="background: #fff1f2; border: none; width: 28px; height: 28px; border-radius: 50%; color: #ef4444; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; pointer-events: auto;" class="note-del-btn" title="Delete Note">
-                                    <i class="fas fa-trash" style="font-size: 0.75rem;"></i>
-                                </button>
+                    container.innerHTML = d.notes.map(n => {
+                        const isCurrent = n.appointment_id == apptId;
+                        const apptDateStr = new Date(n.preferred_date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+                        const logTimeStr = new Date(n.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+
+                        return `
+                            <div class="note-entry" style="background:white; border: 1px solid ${isCurrent ? '#e2e8f0' : '#f1f5f9'}; border-radius: 16px; padding: 1.2rem; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 0.8rem; ${!isCurrent ? 'opacity: 0.9;' : ''}">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.6rem;">
+                                    <div style="font-size: 0.68rem; font-weight: 800; color: ${isCurrent ? 'var(--admin-blue)' : '#64748b'}; text-transform: uppercase; letter-spacing: 0.6px; display:flex; align-items:center; gap:0.4rem;">
+                                        <i class="fas ${isCurrent ? 'fa-calendar-check' : 'fa-history'}"></i>
+                                        ${isCurrent ? 'Note from Current Appointment' : `Previous Data — ${apptDateStr}`}
+                                    </div>
+                                    <div style="font-size: 0.65rem; color: #94a3b8;">${logTimeStr}</div>
+                                </div>
+                                <div style="font-size: 0.92rem; color: #1e293b; line-height: 1.6; padding-right: 4rem; font-family: 'DM Sans', sans-serif;">${n.admin_note}</div>
+                                <div style="position: absolute; top: 1.2rem; right: 1.2rem; display: flex; gap: 0.4rem;">
+                                    <button onclick='prepareEditNote(${JSON.stringify(n)})' style="background: #eff6ff; border: none; width: 28px; height: 28px; border-radius: 50%; color: var(--admin-blue); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" class="note-edit-btn" title="Edit Note">
+                                        <i class="fas fa-pen" style="font-size: 0.7rem;"></i>
+                                    </button>
+                                    <button onclick="executeDeleteNote(${n.id}, ${apptId})" style="background: #fff1f2; border: none; width: 28px; height: 28px; border-radius: 50%; color: #ef4444; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" class="note-del-btn" title="Delete Note">
+                                        <i class="fas fa-trash" style="font-size: 0.75rem;"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
             } catch (e) {
-                container.innerHTML = '<div style="text-align:center; color:#ef4444;">Failed to load notes.</div>';
+                container.innerHTML = '<div style="text-align:center; color:#ef4444; padding:1rem;">Failed to load notes.</div>';
             }
         }
 
