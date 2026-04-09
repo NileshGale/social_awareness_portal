@@ -244,10 +244,26 @@
 
         .search-box i {
             position: absolute;
-            left: 1rem;
             top: 50%;
             transform: translateY(-50%);
             color: #9ca3af;
+            transition: all 0.2s;
+        }
+
+        .search-box .fa-search {
+            left: 1rem;
+        }
+
+        .search-box .clear-search {
+            right: 1rem;
+            cursor: pointer;
+            padding: 5px;
+            display: none;
+        }
+
+        .search-box .clear-search:hover {
+            color: var(--accent);
+            transform: translateY(-50%) scale(1.1);
         }
 
         .search-box input {
@@ -285,6 +301,31 @@
             gap: 1.5rem;
             transition: transform 0.2s, box-shadow 0.2s;
             border: 1px solid #f3f4f6;
+            position: relative;
+        }
+
+        .appointment-card.next-primary {
+            border: 2px solid var(--admin-blue);
+            background: linear-gradient(to right, #ffffff, #f8faff);
+            box-shadow: 0 10px 30px rgba(30, 64, 175, 0.1);
+        }
+
+        .next-badge {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: var(--admin-blue);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(30, 64, 175, 0.3);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         .appointment-card:hover {
@@ -691,6 +732,7 @@
             <div class="search-box">
                 <i class="fas fa-search"></i>
                 <input type="text" id="searchInput" placeholder="Search by name, email or date..." oninput="filterAppointments()">
+                <i class="fas fa-times-circle clear-search" id="clearSearch" onclick="clearSearchInput()" title="Clear Search"></i>
             </div>
             <div style="display:flex; gap:0.5rem; align-items:center; color:#6b7280; font-size:0.85rem; font-weight:600;">
                 <i class="fas fa-filter"></i>
@@ -867,7 +909,11 @@
                 return;
             }
 
-            container.innerHTML = list.map(app => {
+            const now = new Date();
+            container.innerHTML = list.map((app, index) => {
+                const appDateTime = new Date(app.preferred_date + ' ' + app.preferred_time);
+                const isNext = index === 0 && appDateTime >= now;
+                
                 const dateFriendly = new Date(app.preferred_date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
                 const timeFriendly = formatAMPM(app.preferred_time);
                 const avatar = app.profile_image 
@@ -876,7 +922,8 @@
 
                 const initials = app.name ? app.name.charAt(0).toUpperCase() : 'U';
                 return `
-                    <div class="appointment-card" data-id="${app.id}">
+                    <div class="appointment-card ${isNext ? 'next-primary' : ''}" data-id="${app.id}">
+                        ${isNext ? `<div class="next-badge"><i class="fas fa-star"></i> NEXT APPOINTMENT</div>` : ''}
                         <div class="user-col">
                             <div class="user-avatar">
                                 ${avatar ? `<img src="${avatar}" alt="" onerror="this.src=''; this.parentElement.textContent='${initials}'">` : initials}
@@ -941,9 +988,25 @@
             document.getElementById('stat-confirmed').textContent = allAppointments.filter(a => a.status === 'confirmed').length;
         }
 
+        function clearSearchInput() {
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            filterAppointments();
+            input.focus();
+        }
+
         function filterAppointments() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
+            const input = document.getElementById('searchInput');
+            const clearIcon = document.getElementById('clearSearch');
+            const query = input.value.toLowerCase();
             const status = document.getElementById('statusFilter').value;
+
+            // Toggle clear icon
+            if (query) {
+                clearIcon.style.display = 'block';
+            } else {
+                clearIcon.style.display = 'none';
+            }
 
             const filtered = allAppointments.filter(app => {
                 const matchQuery = app.name.toLowerCase().includes(query) || 

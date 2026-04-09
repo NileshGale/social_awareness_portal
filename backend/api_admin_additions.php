@@ -592,7 +592,16 @@ function handleAdminGetAppointments() {
     $query = "SELECT s.*, u.profile_image 
               FROM schedule_bookings s
               LEFT JOIN users u ON s.user_id = u.id
-              ORDER BY s.preferred_date ASC, s.preferred_time ASC";
+              ORDER BY 
+                CASE 
+                    WHEN CONCAT(s.preferred_date, ' ', s.preferred_time) >= NOW() THEN 0 
+                    ELSE 1 
+                END ASC,
+                CASE 
+                    WHEN CONCAT(s.preferred_date, ' ', s.preferred_time) >= NOW() 
+                    THEN CONCAT(s.preferred_date, ' ', s.preferred_time) 
+                END ASC,
+                CONCAT(s.preferred_date, ' ', s.preferred_time) DESC";
 
     $result = $conn->query($query);
     $appointments = $result->fetch_all(MYSQLI_ASSOC);
