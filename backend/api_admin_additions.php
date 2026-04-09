@@ -554,47 +554,14 @@ function handleBookSchedule() {
     }
 
     $stmt = $conn->prepare("INSERT INTO schedule_bookings (user_id, name, email, mobile, problem_desc, preferred_date, preferred_time) VALUES (?,?,?,?,?,?,?)");
+    if (!$stmt) {
+        echo json_encode(['success' => false, 'message' => 'Database error (prepare failed): ' . $conn->error]);
+        return;
+    }
     $stmt->bind_param("issssss", $user_id, $name, $email, $mobile, $problem_desc, $preferred_date, $preferred_time);
     
     if ($stmt->execute()) {
-        // Send email to admin
-        $admin_email = "dhanashreegame@gmail.com";
-        $subject = "New Schedule Booking Request on Zoom or Google Meet";
-        $email_body = "
-        <html>
-        <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
-            <h2 style='color: #1e3a8a;'>New Consultation Booking Request</h2>
-            <p>A new schedule booking request has been received from AwareX:</p>
-            <table style='width: 100%; border-collapse: collapse; margin-top: 20px;'>
-                <tr>
-                    <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold; width: 30%;'>Full Name</td>
-                    <td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($name) . "</td>
-                </tr>
-                <tr>
-                    <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Email Address</td>
-                    <td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($email) . "</td>
-                </tr>
-                <tr>
-                    <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Mobile Number</td>
-                    <td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($mobile) . "</td>
-                </tr>
-                <tr>
-                    <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Preferred Appointment</td>
-                    <td style='padding: 10px; border: 1px solid #ddd;'>" . date('d-M-Y', strtotime($preferred_date)) . " at " . date('h:i A', strtotime($preferred_time)) . "</td>
-                </tr>
-                <tr>
-                    <td style='padding: 10px; border: 1px solid #ddd; font-weight: bold;'>Problem Description</td>
-                    <td style='padding: 10px; border: 1px solid #ddd;'>" . nl2br(htmlspecialchars($problem_desc)) . "</td>
-                </tr>
-            </table>
-            <p style='margin-top: 30px; font-size: 0.9em; color: #777;'>Automated message from AwareX.</p>
-        </body>
-        </html>
-        ";
-        
-        $reply_to = ['email' => $email, 'name' => $name];
-        sendNotificationEmail($admin_email, $subject, $email_body, $reply_to);
-
+        // Appointment is saved to database, which will show on admin dashboard
         echo json_encode(['success' => true, 'message' => 'Your schedule has been booked successfully! We will contact you soon.', 'id' => $stmt->insert_id]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Failed to book schedule. Please try again.']);
@@ -654,6 +621,10 @@ function handleAdminUpdateAppointment() {
     }
 
     $stmt = $conn->prepare("UPDATE schedule_bookings SET preferred_date=?, preferred_time=?, meet_link=?, status=? WHERE id=?");
+    if (!$stmt) {
+        echo json_encode(['success' => false, 'message' => 'Database error (prepare failed): ' . $conn->error]);
+        return;
+    }
     $stmt->bind_param("ssssi", $preferred_date, $preferred_time, $meet_link, $status, $id);
     
     if ($stmt->execute()) {

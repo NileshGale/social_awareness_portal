@@ -40,7 +40,7 @@ function sendOTPEmail($to_email, $otp, $purpose) {
                 <p style='color:#4b5563;'>Your One-Time Password (OTP) for <strong>$purpose</strong> is:</p>
                 <div class='otp-box'>
                     <div class='otp'>$otp</div>
-                    <div class='validity'>Valid for 10 minutes only</div>
+                    <div class='validity'>Valid for 3 minutes only</div>
                 </div>
                 <p style='color:#4b5563;'>If you did not request this, please ignore this email or contact us immediately.</p>
             </div>

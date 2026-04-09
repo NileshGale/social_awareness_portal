@@ -183,6 +183,8 @@ CREATE TABLE schedule_bookings (
     mobile          VARCHAR(15)  NOT NULL,
     problem_desc    TEXT         NOT NULL,
     preferred_date  DATE         NOT NULL,
+    preferred_time  TIME         NOT NULL,
+    meet_link       VARCHAR(500) DEFAULT NULL,
     status          ENUM('pending','confirmed','completed','cancelled') NOT NULL DEFAULT 'pending',
     created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),

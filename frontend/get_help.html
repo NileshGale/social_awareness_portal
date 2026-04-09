@@ -822,15 +822,17 @@
                     const sName = document.getElementById('s-name');
                     const sEmail = document.getElementById('s-email');
                     const sMobile = document.getElementById('s-mobile');
-                    if (sName && !sName.value) { sName.value = data.user.full_name || ''; sName.readOnly = true; }
-                    if (sEmail && !sEmail.value) { sEmail.value = data.user.email || ''; sEmail.readOnly = true; }
-                    if (sMobile && !sMobile.value) { sMobile.value = data.user.mobile || ''; sMobile.readOnly = true; }
-
                     // Contact Section Form
                     const cName = document.getElementById('c-name');
                     const cEmail = document.getElementById('c-email');
-                    if (cName && !cName.value) { cName.value = data.user.full_name || ''; cName.readOnly = true; }
-                    if (cEmail && !cEmail.value) { cEmail.value = data.user.email || ''; cEmail.readOnly = true; }
+
+                    const readOnlyStyle = 'background: #f3f4f6; cursor: not-allowed;';
+
+                    if (sName && !sName.value) { sName.value = data.user.full_name || ''; }
+                    if (sEmail) { sEmail.value = data.user.email || ''; sEmail.readOnly = true; sEmail.style.cssText = readOnlyStyle; }
+                    if (sMobile && !sMobile.value) { sMobile.value = data.user.mobile || ''; }
+                    if (cName && !cName.value) { cName.value = data.user.full_name || ''; }
+                    if (cEmail) { cEmail.value = data.user.email || ''; cEmail.readOnly = true; cEmail.style.cssText = readOnlyStyle; }
                 }
             }).catch(() => { });
         // ── 20-Minute Idle Auto-Logout ─────────────────────────────────

@@ -141,7 +141,7 @@ function handleVerifyRegistrationOTP() {
         return;
     }
 
-    $stmt = $conn->prepare("SELECT id FROM otp_records WHERE email=? AND otp=? AND purpose='registration' AND is_used=0 AND created_at >= DATE_SUB(NOW(), INTERVAL 15 MINUTE) ORDER BY created_at DESC LIMIT 1");
+    $stmt = $conn->prepare("SELECT id FROM otp_records WHERE email=? AND otp=? AND purpose='registration' AND is_used=0 AND created_at >= DATE_SUB(NOW(), INTERVAL 3 MINUTE) ORDER BY created_at DESC LIMIT 1");
     $stmt->bind_param("ss", $email, $otp);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -300,7 +300,7 @@ function handleVerifyResetOTP() {
     $email = sanitizeInput($_POST['email'] ?? '');
     $otp   = sanitizeInput($_POST['otp'] ?? '');
 
-    $stmt = $conn->prepare("SELECT id FROM otp_records WHERE email=? AND otp=? AND purpose='password_reset' AND is_used=0 AND created_at >= DATE_SUB(NOW(), INTERVAL 15 MINUTE) ORDER BY created_at DESC LIMIT 1");
+    $stmt = $conn->prepare("SELECT id FROM otp_records WHERE email=? AND otp=? AND purpose='password_reset' AND is_used=0 AND created_at >= DATE_SUB(NOW(), INTERVAL 3 MINUTE) ORDER BY created_at DESC LIMIT 1");
     $stmt->bind_param("ss", $email, $otp);
     $stmt->execute();
     if ($stmt->get_result()->num_rows === 0) {
@@ -450,7 +450,7 @@ function handleVerifyEmailChange() {
     $user_id = getCurrentUserId();
     $otp     = sanitizeInput($_POST['otp'] ?? '');
 
-    $stmt = $conn->prepare("SELECT id, new_email FROM email_change_pending WHERE user_id=? AND otp=? AND is_verified=0 AND created_at >= DATE_SUB(NOW(), INTERVAL 15 MINUTE) ORDER BY created_at DESC LIMIT 1");
+    $stmt = $conn->prepare("SELECT id, new_email FROM email_change_pending WHERE user_id=? AND otp=? AND is_verified=0 AND created_at >= DATE_SUB(NOW(), INTERVAL 3 MINUTE) ORDER BY created_at DESC LIMIT 1");
     $stmt->bind_param("is", $user_id, $otp);
     $stmt->execute();
     $result = $stmt->get_result();
