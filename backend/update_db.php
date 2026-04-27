@@ -24,11 +24,33 @@ foreach ($columns_to_add as $col => $definition) {
     }
 }
 
-// 2. Create notifications table
+// 2. Ensure notifications has necessary columns
+$noti_columns = [
+    'type'           => "VARCHAR(50) DEFAULT 'general' AFTER message",
+    'appointment_id' => "INT DEFAULT NULL AFTER type"
+];
+
+foreach ($noti_columns as $col => $definition) {
+    $check = $conn->query("SHOW COLUMNS FROM notifications LIKE '$col'");
+    if ($check->num_rows === 0) {
+        $q = "ALTER TABLE notifications ADD $col $definition";
+        if ($conn->query($q)) {
+            echo "Added column '$col' to notifications.\n";
+        } else {
+            echo "Error adding '$col' to notifications: " . $conn->error . "\n";
+        }
+    } else {
+        echo "Column '$col' already exists in notifications.\n";
+    }
+}
+
+// 3. Create notifications table if not exists
 $q_notifications = "CREATE TABLE IF NOT EXISTS notifications (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     message TEXT NOT NULL,
+    type VARCHAR(50) DEFAULT 'general',
+    appointment_id INT DEFAULT NULL,
     is_read TINYINT(1) NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -39,6 +61,22 @@ if ($conn->query($q_notifications)) {
     echo "Table 'notifications' checked/created successfully.\n";
 } else {
     echo "Error creating 'notifications' table: " . $conn->error . "\n";
+}
+
+// 4. Create appointment_notes table if not exists
+$q_notes = "CREATE TABLE IF NOT EXISTS appointment_notes (
+    id INT NOT NULL AUTO_INCREMENT,
+    appointment_id INT NOT NULL,
+    admin_note TEXT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_note_appt FOREIGN KEY (appointment_id) REFERENCES schedule_bookings(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+if ($conn->query($q_notes)) {
+    echo "Table 'appointment_notes' checked/created successfully.\n";
+} else {
+    echo "Error creating 'appointment_notes' table: " . $conn->error . "\n";
 }
 
 echo "Database Update Completed.\n";

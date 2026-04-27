@@ -192,14 +192,28 @@ CREATE TABLE schedule_bookings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================================
---  TABLE 12: notifications
+--  TABLE 12: appointment_notes
+-- ================================================================
+CREATE TABLE appointment_notes (
+    id             INT          NOT NULL AUTO_INCREMENT,
+    appointment_id INT          NOT NULL,
+    admin_note     TEXT         NOT NULL,
+    created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_note_appt FOREIGN KEY (appointment_id) REFERENCES schedule_bookings(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ================================================================
+--  TABLE 13: notifications
 -- ================================================================
 CREATE TABLE notifications (
-    id          INT          NOT NULL AUTO_INCREMENT,
-    user_id     INT          NOT NULL,
-    message     TEXT         NOT NULL,
-    is_read     TINYINT(1)   NOT NULL DEFAULT 0,
-    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id             INT          NOT NULL AUTO_INCREMENT,
+    user_id        INT          NOT NULL,
+    message        TEXT         NOT NULL,
+    type           VARCHAR(50)  DEFAULT 'general',
+    appointment_id INT          DEFAULT NULL,
+    is_read        TINYINT(1)   NOT NULL DEFAULT 0,
+    created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     CONSTRAINT fk_noti_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
